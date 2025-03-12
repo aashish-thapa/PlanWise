@@ -56,7 +56,7 @@
 
         const token = localStorage.getItem("token");
   
-        axios.post('http://localhost:5000/api/events', eventData, {
+        axios.post('http://localhost:5000/api/auth/events', eventData, {
   headers: {
     Authorization: `Bearer ${token}` // Replace with actual token storage method
   }

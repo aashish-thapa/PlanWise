@@ -36,11 +36,13 @@
   </template>
   
   <script>
+  import axios from "axios";
+  
   export default {
-    name: 'EventPage',
+    name: "EventPage",
     data() {
       return {
-        events: [], // Will fetch from API
+        events: [], // Stores events fetched from API
       };
     },
     created() {
@@ -50,15 +52,15 @@
       // Fetch Events from API
       async fetchEvents() {
         try {
-          const response = await fetch('/api/events');
-          if (response.ok) {
-            const data = await response.json();
-            this.events = data;
-          } else {
-            console.error('Failed to fetch events');
-          }
+          const token = localStorage.getItem("token"); // Retrieve stored token
+  
+          const response = await axios.get("http://localhost:5000/api/events", {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          });
+  
+          this.events = response.data;
         } catch (error) {
-          console.error('Error fetching events:', error);
+          console.error("Error fetching events:", error.response?.data || error.message);
         }
       },
     },
