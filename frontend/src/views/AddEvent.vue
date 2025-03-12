@@ -30,47 +30,51 @@
   </template>
   
   <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        event: {
-          name: '',
-          date: '',
-          time: '',
-          location: '',
-          imageUrl: '',
-        },
-      };
-    },
-    methods: {
-      addEvent() {
-        const eventData = {
-          name: this.event.name,
-          date: this.event.date,
-          time: this.event.time,
-          location: this.event.location,
-          imageUrl: this.event.imageUrl,
-        };
+ import axios from 'axios';
 
-        const token = localStorage.getItem("token");
-  
-        axios.post('http://localhost:5000/api/auth/events', eventData, {
-  headers: {
-    Authorization: `Bearer ${token}` // Replace with actual token storage method
-  }
-})
-          .then(response => {
-            console.log('Event Created:', response);
-            this.$router.push('/events');
-          })
-          .catch(error => {
-            console.error('Error creating event:', error);
-          });
+export default {
+  data() {
+    return {
+      event: {
+        name: '',
+        date: '',
+        time: '',
+        location: '',
+        imageUrl: '',
       },
+    };
+  },
+  methods: {
+    addEvent() {
+      const eventData = { ...this.event };
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No authentication token found");
+        return alert("You need to log in first!");
+      }
+
+      axios.post('http://localhost:5000/api/events', eventData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        }
+      })
+      .then(response => {
+        console.log('Event Created:', response);
+        if (this.$router) {
+          this.$router.push('/events');
+        } else {
+          window.location.href = "/events";
+        }
+      })
+      .catch(error => {
+        console.error('Error creating event:', error.response ? error.response.data : error.message);
+      });
     },
-  };
+  },
+};
+
   </script>
   
   <style scoped>

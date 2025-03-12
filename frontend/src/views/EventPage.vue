@@ -27,7 +27,9 @@
               <h3>{{ event.title }}</h3>
               <p>{{ event.date }}</p>
               <p>{{ event.description }}</p>
-              <router-link :to="'/event/' + event.id" class="btn-view-event">View Details</router-link>
+              <router-link :to="`/event/${event.id}`" class="btn-view-event">
+                View Details
+              </router-link>            
             </div>
           </div>
         </div>
@@ -52,7 +54,7 @@
       // Fetch Events from API
       async fetchEvents() {
         try {
-          const token = localStorage.getItem("token"); // Retrieve stored token
+          const token = localStorage.getItem('token'); // Retrieve stored token
   
           const response = await axios.get("http://localhost:5000/api/events", {
             headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -4,13 +4,27 @@ import EventPage from '../views/EventPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import SignupPage from '@/views/SignupPage.vue';
 import AddEvent from '@/views/AddEvent.vue';
+import EventDetails from '@/views/EventDetails.vue';
 
 const routes = [
   { path: '/', component: HomePage },
   { path: '/events', component: EventPage , meta: {requiresAuth: true}},
   { path: '/login', component: LoginPage }
   ,{path: '/signup', component: SignupPage},
-  {path: '/add-event', component: AddEvent}
+  {path: '/add-event', component: AddEvent},
+  {
+    path: "/event/:id",
+    name: "EventDetails",
+    component: () => import("@/views/EventDetails.vue"),
+    props: true // Pass route params as props
+  },
+  {
+    path: "/expenses/:id",
+    name: "ManageExpenses",
+    component: () => import("@/views/ManageExpenses.vue"),
+    props: true // Pass route params as props
+  }
+
 ];
 
 const router = createRouter({
