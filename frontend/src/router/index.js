@@ -3,12 +3,14 @@ import HomePage from '../views/HomePage.vue';
 import EventPage from '../views/EventPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import SignupPage from '@/views/SignupPage.vue';
+import AddEvent from '@/views/AddEvent.vue';
 
 const routes = [
   { path: '/', component: HomePage },
   { path: '/events', component: EventPage , meta: {requiresAuth: true}},
   { path: '/login', component: LoginPage }
-  ,{path: '/signup', component: SignupPage}
+  ,{path: '/signup', component: SignupPage},
+  {path: '/add-event', component: AddEvent}
 ];
 
 const router = createRouter({

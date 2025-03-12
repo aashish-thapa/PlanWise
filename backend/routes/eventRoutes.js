@@ -5,12 +5,13 @@ const router = express.Router();
 
 // Create Event
 router.post('/', authenticateUser, async (req, res) => {
-    const { name, date, location } = req.body;
+    const { name, date, location, imageUrl } = req.body; // Add imageUrl
     const db = req.app.get('db');
 
     try {
-        await db.query('INSERT INTO events (user_id, name, date, location) VALUES (?, ?, ?, ?)', 
-                      [req.user.id, name, date, location]);
+        // Insert event with imageUrl
+        await db.query('INSERT INTO events (user_id, name, date, location, image_url) VALUES (?, ?, ?, ?, ?)', 
+                      [req.user.id, name, date, location, imageUrl]);
         res.status(201).json({ message: 'Event created successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });

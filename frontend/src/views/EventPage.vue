@@ -3,6 +3,11 @@
       <div class="hero-section">
         <h1>Event Page</h1>
         <p>Explore and manage all the upcoming events.</p>
+  
+        <!-- Add Event Button -->
+        <router-link to="/add-event" class="btn-add-event">Add Event</router-link>
+        
+        <!-- Go to Home Button -->
         <router-link to="/" class="btn-go-home">Go to Home</router-link>
       </div>
   
@@ -10,6 +15,12 @@
       <section class="event-list">
         <h2>Upcoming Events</h2>
         <div class="events">
+          <!-- If there are no events -->
+          <div v-if="events.length === 0" class="no-events">
+            <p>No events to display. Start by adding one!</p>
+          </div>
+  
+          <!-- Event Cards -->
           <div class="event-card" v-for="event in events" :key="event.id">
             <img :src="event.image" :alt="event.title" />
             <div class="event-info">
@@ -21,7 +32,6 @@
           </div>
         </div>
       </section>
-  
     </div>
   </template>
   
@@ -30,30 +40,27 @@
     name: 'EventPage',
     data() {
       return {
-        events: [
-          {
-            id: 1,
-            title: 'Community Picnic',
-            date: 'March 25, 2025',
-            description: 'Join us for a fun-filled day at the park with games, food, and activities for the whole family.',
-            image: 'https://via.placeholder.com/400x250',
-          },
-          {
-            id: 2,
-            title: 'Tech Talk: The Future of AI',
-            date: 'April 10, 2025',
-            description: 'A deep dive into the latest trends and developments in Artificial Intelligence.',
-            image: 'https://via.placeholder.com/400x250',
-          },
-          {
-            id: 3,
-            title: 'Charity Gala',
-            date: 'May 5, 2025',
-            description: 'An elegant evening of fundraising to support local charities and community initiatives.',
-            image: 'https://via.placeholder.com/400x250',
-          },
-        ],
+        events: [], // Will fetch from API
       };
+    },
+    created() {
+      this.fetchEvents();
+    },
+    methods: {
+      // Fetch Events from API
+      async fetchEvents() {
+        try {
+          const response = await fetch('/api/events');
+          if (response.ok) {
+            const data = await response.json();
+            this.events = data;
+          } else {
+            console.error('Failed to fetch events');
+          }
+        } catch (error) {
+          console.error('Error fetching events:', error);
+        }
+      },
     },
   };
   </script>
@@ -73,7 +80,7 @@
   
   /* Hero Section */
   .hero-section {
-    background: #082d55;;
+    background: #082d55;
     padding: 50px;
     border-radius: 15px;
     color: white;
@@ -91,6 +98,27 @@
   .hero-section p {
     font-size: 1.5rem;
     margin-bottom: 30px;
+  }
+  
+  /* Add Event Button */
+  .btn-add-event {
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    background-color: #4caf50;
+    color: white;
+    border: 2px solid #4caf50;
+    text-decoration: none;
+    display: inline-block;
+    margin-right: 40px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-add-event:hover {
+    background-color: #45a049;
+    color: black;
+    border: 2px solid #45a049;
   }
   
   .btn-go-home {
@@ -176,6 +204,13 @@
   
   .btn-view-event:hover {
     background-color: #ff7f50;
+  }
+  
+  /* No Events Section */
+  .no-events {
+    font-size: 1.2rem;
+    color: #999;
+    margin-top: 20px;
   }
   </style>
   
