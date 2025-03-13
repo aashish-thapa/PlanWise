@@ -300,10 +300,10 @@ export default {
     },
 
     navigateToTaskManager() {
-      this.$router.push({ name: "task-manager" });
+      this.$router.push({ name: "TaskManager" });
     },
     navigateToExpenses() {
-      this.$router.push({ name: "expenses" });
+      this.$router.push({ name: "Expenses" });
     },
 
     sendInvitations() {

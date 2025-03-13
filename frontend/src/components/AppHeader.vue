@@ -27,8 +27,11 @@
 
 
 <script>
+import { watch } from "vue";
+import { useRoute } from "vue-router";
+
 export default {
-  name: 'AppHeader',
+  name: "AppHeader",
   data() {
     return {
       isMenuOpen: false,
@@ -43,17 +46,25 @@ export default {
       this.isMenuOpen = !this.isMenuOpen;
     },
     checkLoginStatus() {
-      // Check if the user is logged in (this can be from a token or localStorage)
-      this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      this.isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
     },
     signOut() {
-      localStorage.removeItem('isLoggedIn'); // Remove the login status
+      localStorage.removeItem("isLoggedIn");
       this.isLoggedIn = false;
-      this.$router.push('/login'); // Redirect to login page
+      this.$router.push("/login");
     },
+  },
+  mounted() {
+    const route = useRoute();
+
+    // Watch for route changes and update login status
+    watch(route, () => {
+      this.checkLoginStatus();
+    });
   },
 };
 </script>
+
 
 
 <style scoped>

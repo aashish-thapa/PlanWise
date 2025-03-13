@@ -8,7 +8,7 @@
       <button type="submit">{{ isEditing ? "Update Task" : "Add Task" }}</button>
     </form>
 
-    <div v-if="tasks.length" class="task-list">
+    <div v-if="tasks.length > 0" class="task-list">
       <h3>Your Tasks</h3>
       <ul>
         <li v-for="task in tasks" :key="task.id" class="task-item">
@@ -17,12 +17,16 @@
             <span class="due-date">{{ task.due_date }}</span>
             <p>{{ task.description }}</p>
           </div>
+          <!-- These action buttons will only appear on hover -->
           <div class="task-actions">
             <button class="edit-btn" @click="loadTaskForEdit(task)">Edit</button>
             <button class="delete-btn" @click="deleteTask(task.id)">Delete</button>
           </div>
         </li>
       </ul>
+    </div>
+    <div v-else class="no-tasks">
+      <p>No tasks added yet. Start by creating a task!</p>
     </div>
   </div>
 </template>
@@ -47,15 +51,15 @@ export default {
   },
   methods: {
     async fetchTasks() {
-  try {
-    const response = await axios.get(`http://localhost:5000/api/tasks/${this.$route.params.id}`, {
-      headers: { Authorization: `Bearer ${this.token}` }
-    });
-    this.tasks = response.data.tasks; // Extracting the tasks array
-  } catch (error) {
-    console.error('Error fetching tasks:', error);
-  }
-},
+      try {
+        const response = await axios.get(`http://localhost:5000/api/tasks/${this.$route.params.id}`, {
+          headers: { Authorization: `Bearer ${this.token}` }
+        });
+        this.tasks = response.data.tasks;
+      } catch (error) {
+        console.error('Error fetching tasks:', error);
+      }
+    },
     async addTask() {
       try {
         this.newTask.event_id = this.$route.params.id;
@@ -111,7 +115,9 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.task-form input, .task-form textarea, .task-form button {
+.task-form input,
+.task-form textarea,
+.task-form button {
   display: block;
   margin: 10px 0;
   width: 100%;
@@ -145,6 +151,12 @@ export default {
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 10px;
+  position: relative; /* For positioning the actions */
+  transition: background-color 0.3s ease;
+}
+
+.task-item:hover {
+  background-color: #f0f0f0;
 }
 
 .task-content {
@@ -154,6 +166,21 @@ export default {
 .due-date {
   font-size: 0.9em;
   color: #888;
+}
+
+/* Task Actions - hidden by default and shown on hover */
+.task-actions {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  opacity: 0;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+.task-item:hover .task-actions {
+  opacity: 1;
 }
 
 .task-actions button {
@@ -180,5 +207,12 @@ export default {
 
 .delete-btn:hover {
   background: #c82333;
+}
+
+.no-tasks {
+  text-align: center;
+  color: #888;
+  font-size: 1.2em;
+  margin-top: 20px;
 }
 </style>

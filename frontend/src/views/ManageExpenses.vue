@@ -29,10 +29,16 @@
     <!-- Expenses List -->
     <h2>Expenses List</h2>
     <ul class="expenses-list">
-      <li v-for="expense in expenses" :key="expense.id">
+      <li v-for="expense in expenses" :key="expense.id" 
+          @mouseover="hoveredExpense = expense" @mouseleave="hoveredExpense = null">
         <span>{{ expense.description }}</span>
         <span class="amount">${{ parseFloat(expense.amount).toFixed(2) }}</span>
         <span class="category">{{ expense.category }}</span>
+
+        <!-- Show additional details on hover -->
+        <div v-if="hoveredExpense && hoveredExpense.id === expense.id" class="hover-details">
+          <p><strong>Details:</strong> Additional information about the expense goes here.</p>
+        </div>
       </li>
     </ul>
 
@@ -79,6 +85,8 @@ export default {
       event: null,
       expenses: [],
       newExpense: { description: "", amount: "", category: "decoration" },
+      hoveredExpense: null,
+      chartInstance: null, // To hold the chart instance for updating
     };
   },
   computed: {
@@ -150,12 +158,15 @@ export default {
         );
         this.newExpense = { description: "", amount: "", category: "decoration" };
         this.fetchExpenses();
-        
       } catch (error) {
         console.error("Error adding expense:", error);
       }
     },
     createChart() {
+      if (this.chartInstance) {
+        this.chartInstance.destroy(); // Destroy the old chart if it exists
+      }
+
       const categories = [...new Set(this.expenses.map((exp) => exp.category))];
       const amounts = categories.map((category) =>
         this.expenses
@@ -164,7 +175,7 @@ export default {
       );
 
       const ctx = document.getElementById("expenseChart").getContext("2d");
-      new ChartJS(ctx, {
+      this.chartInstance = new ChartJS(ctx, {
         type: "bar",
         data: {
           labels: categories,
@@ -234,6 +245,36 @@ h2 {
   border-radius: 5px;
   border: 1px solid #ddd;
   box-sizing: border-box;
+}
+
+/* Hover effect and details */
+.expenses-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.expenses-list li:hover {
+  background-color: #e0e0e0;
+}
+
+/* Details box that shows on hover */
+.hover-details {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
 }
 
 button {

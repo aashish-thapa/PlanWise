@@ -20,7 +20,7 @@ const routes = [
   },
   {
     path: "/expenses/:id",
-    name: "ManageExpenses",
+    name: "Expenses",
     component: () => import("@/views/ManageExpenses.vue"),
     props: true // Pass route params as props
   },
