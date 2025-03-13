@@ -28,7 +28,7 @@ app.set('db', db);
 app.use('/api/events', eventRoutes);
 app.use('/api/guests', guestRoutes);
 app.use('/api/expenses', expenseRoutes);
-app.use('api/task', taskRoutes);
+app.use('/api/tasks', taskRoutes);
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {

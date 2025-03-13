@@ -17,28 +17,44 @@
       <div :class="['nav-links', { 'active': isMenuOpen }]">
         <router-link to="/" class="nav-link">Home</router-link>
         <router-link to="/events" class="nav-link">Events</router-link>
-        <router-link to="/login" class="nav-link login">Login</router-link>
-        <router-link to="/signup" class="nav-link signup">Sign Up</router-link>
+        <router-link v-if="!isLoggedIn" to="/login" class="nav-link login">Login</router-link>
+        <router-link v-if="!isLoggedIn" to="/signup" class="nav-link signup">Sign Up</router-link>
+        <router-link v-if="isLoggedIn" to="/signout" @click.prevent="signOut" class="nav-link signout">Sign Out</router-link>
       </div>
     </nav>
   </header>
 </template>
+
 
 <script>
 export default {
   name: 'AppHeader',
   data() {
     return {
-      isMenuOpen: false
+      isMenuOpen: false,
+      isLoggedIn: false,
     };
+  },
+  created() {
+    this.checkLoginStatus();
   },
   methods: {
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
-    }
-  }
+    },
+    checkLoginStatus() {
+      // Check if the user is logged in (this can be from a token or localStorage)
+      this.isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    },
+    signOut() {
+      localStorage.removeItem('isLoggedIn'); // Remove the login status
+      this.isLoggedIn = false;
+      this.$router.push('/login'); // Redirect to login page
+    },
+  },
 };
 </script>
+
 
 <style scoped>
 /* General Styles for Header */

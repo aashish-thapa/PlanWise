@@ -2,31 +2,31 @@
   <footer>
     <div class="footer-content">
       <div class="footer-section">
-        <h4>About Hobby Organizer</h4>
-        <p>Event Organizer is your go-to platform for managing and organizing events effortlessly. Whether personal or corporate, we simplify the planning process.</p>
+        <h4>About PlanWise</h4>
+        <p>PlanWise is the ultimate platform for seamlessly managing and organizing events, whether personal or corporate. We simplify event planning, making it stress-free for everyone.</p>
       </div>
       
       <div class="footer-section">
         <h4>Quick Links</h4>
         <ul>
           <li><router-link to="/events">Browse Events</router-link></li>
-          <li><router-link to="/about">About Us</router-link></li>
-          <li><router-link to="/contact">Contact Us</router-link></li>
+          <li><a href="https://aashish-thapa.com.np">About Us</a></li>
+          <li><a href ="https://aashish-thapa.com.np">Portfolio</a></li>
         </ul>
       </div>
 
       <div class="footer-section">
-        <h4>Follow Us</h4>
+        <h4>Follow The Developer</h4>
         <div class="social-icons">
-          <a href="#" target="_blank" class="social-icon">FB</a>
-          <a href="#" target="_blank" class="social-icon">TW</a>
-          <a href="#" target="_blank" class="social-icon">IG</a>
+          <a href="https://www.facebook.com/aashish.thapa.96742/" target="_blank" class="social-icon">FB</a>
+          <a href="https://github.com/aashish-thapa" target="_blank" class="social-icon">Github</a>
+          <a href="https://www.instagram.com/iamaashishthapa/" target="_blank" class="social-icon">IG</a>
         </div>
       </div>
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; 2025 Hobby Organizer. All rights reserved.</p>
+      <p>&copy; 2025 PlanWise. All rights reserved.</p>
     </div>
   </footer>
 </template>
@@ -39,9 +39,10 @@ export default {
 
 <style scoped>
 footer {
-  background-color: #0056b3; /* Blue Background */
+  background-color: #0056b3; /* PlanWise Blue Background */
   color: white;
   padding: 30px 20px;
+  font-family: Arial, sans-serif;
 }
 
 .footer-content {
@@ -49,6 +50,7 @@ footer {
   justify-content: space-between;
   flex-wrap: wrap;
   margin-bottom: 20px;
+  gap: 30px;
 }
 
 .footer-section {
@@ -120,7 +122,13 @@ footer {
   font-weight: 500;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1024px) {
+  .footer-content {
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 768px) {
   .footer-content {
     flex-direction: column;
     align-items: center;
@@ -128,6 +136,44 @@ footer {
 
   .footer-section {
     text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .footer-section h4 {
+    font-size: 1.1rem;
+  }
+
+  .footer-section p {
+    font-size: 0.95rem;
+  }
+
+  .footer-bottom {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-section h4 {
+    font-size: 1rem;
+  }
+
+  .footer-section p {
+    font-size: 0.9rem;
+  }
+
+  .footer-section ul li a {
+    font-size: 0.9rem;
+  }
+
+  .social-icon {
+    width: 35px;
+    height: 35px;
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+
+  .footer-bottom {
+    font-size: 0.8rem;
   }
 }
 </style>

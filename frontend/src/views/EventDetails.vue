@@ -25,9 +25,7 @@
               {{ expense.description }} - ${{ expense.amount }} ({{ expense.category }})
             </li>
           </ul>
-          
         </div>
-        
       </div>
     </div>
 
@@ -75,50 +73,46 @@
       </form>
 
       <!-- Edit form for the selected guest -->
-<div v-if="guestToEdit" class="edit-form">
-  <h3>Edit Guest</h3>
-  <form @submit.prevent="saveGuestEdit">
-    <div>
-      <label for="name">Name:</label>
-      <input type="text" v-model="guestToEdit.name" id="name" required />
-    </div>
-    <div>
-      <label for="email">Email:</label>
-      <input type="email" v-model="guestToEdit.email" id="email" required />
-    </div>
-    <div>
-      <label for="rsvp_status">RSVP Status:</label>
-      <select v-model="guestToEdit.rsvp_status" id="rsvp_status">
-        <option value="Accepted">Accepted</option>
-        <option value="Declined">Declined</option>
-        <option value="Pending">Pending</option>
-      </select>
-    </div>
-    <button type="submit">Save Changes</button>
-    <button type="button" @click="cancelEdit">Cancel</button>
-  </form>
-</div>
+      <div v-if="guestToEdit" class="edit-form">
+        <h3>Edit Guest</h3>
+        <form @submit.prevent="saveGuestEdit">
+          <div>
+            <label for="name">Name:</label>
+            <input type="text" v-model="guestToEdit.name" id="name" required />
+          </div>
+          <div>
+            <label for="email">Email:</label>
+            <input type="email" v-model="guestToEdit.email" id="email" required />
+          </div>
+          <div>
+            <label for="rsvp_status">RSVP Status:</label>
+            <select v-model="guestToEdit.rsvp_status" id="rsvp_status">
+              <option value="Accepted">Accepted</option>
+              <option value="Declined">Declined</option>
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
+          <button type="submit">Save Changes</button>
+          <button type="button" @click="cancelEdit">Cancel</button>
+        </form>
+      </div>
 
       <h2 class="guest-list-title">Attending Guests ({{ guestCount }})</h2>
       <ul class="guest-list">
-  <li
-    v-for="guest in guests"
-    :key="guest.id"
-    class="guest-item"
-  >
-    <div class="guest-info">
-      {{ guest.name ? guest.name : "Unknown" }} 
-      ({{ guest.email ? guest.email : "No Email" }}) - 
-      RSVP: {{ guest.rsvp_status ? guest.rsvp_status : "Pending" }}
-    </div>
+        <li v-for="guest in guests" :key="guest.id" class="guest-item">
+          <div class="guest-info">
+            {{ guest.name ? guest.name : "Unknown" }} 
+            ({{ guest.email ? guest.email : "No Email" }}) - 
+            RSVP: {{ guest.rsvp_status ? guest.rsvp_status : "Pending" }}
+          </div>
 
-    <!-- Edit and Delete buttons (visible on hover) -->
-    <div class="guest-actions">
-      <button @click="editGuest(guest)" class="edit-button">Edit</button>
-      <button @click="deleteGuest(guest.id)" class="delete-button">Delete</button>
-    </div>
-  </li>
-</ul>
+          <!-- Edit and Delete buttons (visible on hover) -->
+          <div class="guest-actions">
+            <button @click="editGuest(guest)" class="edit-button">Edit</button>
+            <button @click="deleteGuest(guest.id)" class="delete-button">Delete</button>
+          </div>
+        </li>
+      </ul>
 
       <button @click="sendInvitations" class="send-invitations-button">Send Invitations to All</button>
     </div>
@@ -149,10 +143,10 @@ export default {
     },
   },
   async created() {
-  await this.fetchEvent();  // Ensure event is loaded first
-  await this.fetchGuests(); // Then fetch guests
-  this.fetchExpenses(); // Fetch expenses as usual
-},
+    await this.fetchEvent();  // Ensure event is loaded first
+    this.fetchGuests(); // Fetch guests after event is available
+    this.fetchExpenses(); // Fetch expenses as usual
+  },
   methods: {
     getAuthHeaders() {
       const token = localStorage.getItem("token");
@@ -170,41 +164,34 @@ export default {
           this.getAuthHeaders()
         );
         this.event = response.data;
-
-        // Fetch guests and expenses only after event data is available
-        this.fetchGuests();
-        this.fetchExpenses();
       } catch (error) {
         console.error("Error fetching event details:", error);
       }
     },
     async updateEvent() {
-  try {
-    // Ensure the event object has all the updated properties
-    const updatedEvent = {
-      name: this.event.title,
-      date: this.event.date,
-      created_at: this.event.time,
-      location: this.event.location,
-      imageUrl: this.event.image,
-    };
-    console.log(updatedEvent);
+      try {
+        const updatedEvent = {
+          title: this.event.title,
+          date: this.event.date,
+          time: this.event.time,
+          location: this.event.location,
+          image: this.event.image,
+        };
 
-    // Update event through API
-    await axios.put(
-      `http://localhost:5000/api/events/${this.event.id}`,
-      updatedEvent,
-      this.getAuthHeaders()
-    );
+        await axios.put(
+          `http://localhost:5000/api/events/${this.event.id}`,
+          updatedEvent,
+          this.getAuthHeaders()
+        );
 
-    alert("Event updated successfully");
-    this.isEditing = false;
-    this.fetchEvent(); // Refresh event details after update
-  } catch (error) {
-    console.error("Error updating event:", error);
-  }
-},
-  async deleteEvent() {
+        alert("Event updated successfully");
+        this.isEditing = false;
+        this.fetchEvent(); // Refresh event details after update
+      } catch (error) {
+        console.error("Error updating event:", error);
+      }
+    },
+    async deleteEvent() {
       if (confirm("Are you sure you want to delete this event?")) {
         try {
           await axios.delete(
@@ -220,27 +207,86 @@ export default {
     },
 
     async fetchGuests() {
-    if (!this.event || !this.event.id) {
-      console.error("Event ID is not available yet");
-      return;
-    }
-    try {
-      const response = await axios.get(
-        `http://localhost:5000/api/guests/${this.event.id}`,
-        this.getAuthHeaders()
-      );
-
-      // Ensure we access the correct key
-      if (response.data && Array.isArray(response.data.guests)) {
-        this.guests = response.data.guests;
-      } else {
-        console.error("Invalid response format for guests:", response.data);
+      if (!this.event || !this.event.id) {
+        console.error("Event ID is not available yet");
+        return;
       }
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/guests/${this.event.id}`,
+          this.getAuthHeaders()
+        );
 
-    } catch (error) {
-      console.error("Error fetching guests:", error);
-    }
-  },
+        if (response.data && Array.isArray(response.data.guests)) {
+          this.guests = response.data.guests;
+        } else {
+          console.error("Invalid response format for guests:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching guests:", error);
+      }
+    },
+    async addGuest() {
+  if (!this.event) {
+    alert("Event not loaded, cannot add guest.");
+    return;
+  }
+
+  try {
+    const response = await axios.post(
+      `http://localhost:5000/api/guests`,
+      {
+        event_id : this.event.id,
+        name: this.newGuest.name,
+        email: this.newGuest.email,
+      },
+      this.getAuthHeaders()
+    );
+    console.log("API Response: ", response.data);
+    this.newGuest = { name: "", email: "" }; // Reset form
+    this.fetchGuests(); // Refresh guest list after adding a new guest
+  } catch (error) {
+    console.error("Error adding guest:", error);
+  }
+}
+    ,
+
+    async deleteGuest(guestId) {
+      try {
+        await axios.delete(
+          `http://localhost:5000/api/guests/${guestId}`,
+          this.getAuthHeaders()
+        );
+        this.guests = this.guests.filter((guest) => guest.id !== guestId);
+      } catch (error) {
+        console.error("Error deleting guest:", error);
+      }
+    },
+
+    editGuest(guest) {
+      this.guestToEdit = { ...guest };
+    },
+
+    async saveGuestEdit() {
+      try {
+        await axios.put(
+          `http://localhost:5000/api/guests/${this.guestToEdit.id}`,
+          this.guestToEdit,
+          this.getAuthHeaders()
+        );
+        this.guests = this.guests.map((guest) =>
+          guest.id === this.guestToEdit.id ? this.guestToEdit : guest
+        );
+        this.guestToEdit = null; // Reset edit form
+      } catch (error) {
+        console.error("Error saving guest edit:", error);
+      }
+    },
+
+    cancelEdit() {
+      this.guestToEdit = null;
+    },
+
     async fetchExpenses() {
       try {
         const response = await axios.get(
@@ -252,69 +298,22 @@ export default {
         console.error("Error fetching expenses:", error);
       }
     },
-    async sendInvitations() {
-      try {
-        const emails = this.guests.map((guest) => guest.email);
-        await axios.post(
-          "http://localhost:5000/api/inviteAll",
-          {
-            eventId: this.event.id,
-            emails,
-          },
-          this.getAuthHeaders()
-        );
-        alert("Invitations sent to all guests!");
-      } catch (error) {
-        console.error("Error sending invitations:", error);
-      }
-    },
-    async deleteGuest(guestId) {
-      if (confirm("Are you sure you want to delete this guest?")) {
-        try {
-          await axios.delete(
-            `http://localhost:5000/api/guests/${guestId}`,
-            this.getAuthHeaders()
-          );
-          alert("Guest deleted successfully");
-          this.fetchGuests(); // Refresh the guest list
-        } catch (error) {
-          console.error("Error deleting guest:", error);
-        }
-      }
-    },
-    async editGuest(guest) {
-      // Set the guest to edit
-      this.guestToEdit = { ...guest };
-      // You can show an edit form here if necessary
-      // This could be done by showing a modal or updating the UI for inline editing
-    },
-    async saveGuestEdit() {
-      try {
-        const updatedGuest = { ...this.guestToEdit };
-        await axios.put(
-          `http://localhost:5000/api/guests/${updatedGuest.id}`,
-          updatedGuest,
-          this.getAuthHeaders()
-        );
-        alert("Guest updated successfully");
-        this.fetchGuests(); // Refresh the guest list
-        this.guestToEdit = null; // Clear edit mode
-      } catch (error) {
-        console.error("Error updating guest:", error);
-      }
-    },
-    cancelEdit(){
-      this.guestToEdit = null;
-    },
+
     navigateToTaskManager() {
-      this.$router.push(`/taskmanager/${this.event.id}`);
+      this.$router.push({ name: "task-manager" });
     },
     navigateToExpenses() {
-      this.$router.push(`/expenses/${this.event.id}`);
+      this.$router.push({ name: "expenses" });
+    },
+
+    sendInvitations() {
+      alert("Sending invitations...");
+      // Implement sending invitations
     },
   },
 };
 </script>
+
 
 <style scoped>
 .edit-event-button {

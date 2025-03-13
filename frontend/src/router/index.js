@@ -4,6 +4,7 @@ import EventPage from '../views/EventPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import SignupPage from '@/views/SignupPage.vue';
 import AddEvent from '@/views/AddEvent.vue';
+import SignOut from '@/views/SignOut.vue';
 
 const routes = [
   { path: '/', component: HomePage },
@@ -28,7 +29,16 @@ const routes = [
     name: "TaskManager",
     component: () => import("@/views/TaskManager.vue"),
     props: true // Pass route params as props
+  },
+  {
+    path: '/signout', component: SignOut, beforeEnter: (to, from, next) => {
+      if (localStorage.getItem('isLoggedIn') !== 'true') {
+        next('/login'); // If the user is not logged in, redirect to login
+      } else {
+        next(); // Proceed to sign-out page
+      }
   }
+},
 
 ];
 
@@ -38,7 +48,11 @@ const router = createRouter({
 });
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token'); // Check if token exists
-  
+    if (to.path === '/signout' && localStorage.getItem('isLoggedIn') !== 'true') {
+      next('/login');
+    } else {
+      next();
+    }
     if (to.matched.some(record => record.meta.requiresAuth)) {
       if (!token) {
         // If the user is not logged in, redirect to login page
