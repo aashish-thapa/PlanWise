@@ -22,11 +22,11 @@
   
           <!-- Event Cards -->
           <div class="event-card" v-for="event in events" :key="event.id">
-            <img :src="event.image" :alt="event.title" />
+            
+            <img :src="event.image_url" :alt="event.name"/>
             <div class="event-info">
-              <h3>{{ event.title }}</h3>
+              <h3>{{ event.name }}</h3>
               <p>{{ event.date }}</p>
-              <p>{{ event.description }}</p>
               <router-link :to="`/event/${event.id}`" class="btn-view-event">
                 View Details
               </router-link>            
@@ -54,11 +54,12 @@
       // Fetch Events from API
       async fetchEvents() {
         try {
+          
           const token = localStorage.getItem('token'); // Retrieve stored token
-  
           const response = await axios.get("http://localhost:5000/api/events", {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
+          console.log(response.data);
   
           this.events = response.data;
         } catch (error) {
@@ -178,7 +179,7 @@
   .event-card img {
     width: 100%;
     height: 200px;
-    object-fit: cover;
+    object-fit: contain;
   }
   
   .event-info {

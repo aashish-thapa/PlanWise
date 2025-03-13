@@ -4,7 +4,6 @@ import EventPage from '../views/EventPage.vue';
 import LoginPage from '../views/LoginPage.vue';
 import SignupPage from '@/views/SignupPage.vue';
 import AddEvent from '@/views/AddEvent.vue';
-import EventDetails from '@/views/EventDetails.vue';
 
 const routes = [
   { path: '/', component: HomePage },

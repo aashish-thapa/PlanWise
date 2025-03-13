@@ -36,8 +36,6 @@
           
           // Store token in localStorage for future use
           localStorage.setItem('token', response.data.token);
-
-          const token = localStorage.getItem('token');
           
           // Set user data in Vuex store or wherever needed
           this.$store.commit('setUser', { email: this.email });

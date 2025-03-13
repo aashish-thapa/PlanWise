@@ -1,176 +1,351 @@
 <template>
-    <div class="event-details-container">
-      <!-- Left side: Task Manager and Manage Expenses -->
-      <div class="left-side">
-        <h2 class="section-title">Task Manager</h2>
-  
-        <!-- Task List -->
-        <div v-for="(task, index) in tasks" :key="task.id" class="task-item">
-          <input v-model="task.completed" type="checkbox" class="task-checkbox" />
-          <input v-model="task.name" type="text" class="task-input" @blur="updateTask(task)" />
-          <button @click="deleteTask(index)" class="delete-button">Delete</button>
-        </div>
-  
-        <button @click="addTask" class="add-button">Add Task</button>
-  
-        <!-- Manage Expenses -->
-        <div class="manage-expenses">
-          <h2 class="section-title">Manage Expenses</h2>
-          <button @click="navigateToExpenses" class="expense-button">Manage Expenses</button>
-          
-          <!-- Displaying Expenses -->
-          <div v-if="expenses.length" class="expense-list">
-            <h3>Expenses for this Event:</h3>
-            <ul>
-              <li v-for="expense in expenses" :key="expense.id">
-                {{ expense.description }} - ${{ expense.amount }} ({{ expense.category }})
-              </li>
-            </ul>
-          </div>
-          <div v-else>
-            <p>No expenses added yet.</p>
-          </div>
-        </div>
+  <div class="event-details-container">
+    <!-- Left side: Task Manager and Manage Expenses -->
+    <div class="left-side">
+      <h2 class="section-title">Task Manager</h2>
+
+      <!-- Task List -->
+      <div v-for="(task, index) in tasks" :key="task.id" class="task-item">
+        <input v-model="task.completed" type="checkbox" class="task-checkbox" />
+        <input v-model="task.name" type="text" class="task-input" @blur="updateTask(task)" />
+        <button @click="deleteTask(index)" class="delete-button">Delete</button>
       </div>
-  
-      <!-- Right side: Event Details and Guests -->
-      <div class="right-side">
-        <!-- Event Title -->
-        <h1 v-if="event" class="event-title">{{ event.title }}</h1>
-  
-        <!-- Event Details Form -->
-        <h2 v-if="event" class="form-title">Edit Event</h2>
-        <div v-if="event" class="form-container">
-          <label for="eventTitle">Title:</label>
-          <input id="eventTitle" v-model="event.title" type="text" class="input-field" />
-  
-          <label for="eventDate">Date:</label>
-          <input id="eventDate" v-model="event.date" type="date" class="input-field" />
-  
-          <label for="eventDescription">Description:</label>
-          <textarea id="eventDescription" v-model="event.description" class="input-field"></textarea>
-  
-          <label for="eventImage">Image URL:</label>
-          <input id="eventImage" v-model="event.image" type="text" class="input-field" />
-  
-          <button @click="updateEvent" class="save-button">Save Changes</button>
+
+      <button @click="addTask" class="add-button">Add Task</button>
+
+      <!-- Manage Expenses -->
+      <div class="manage-expenses">
+        <h2 class="section-title">Manage Expenses</h2>
+        <button @click="navigateToExpenses" class="expense-button">Manage Expenses</button>
+
+        <div v-if="expenses.length" class="expense-list">
+          <h3>Expenses for this Event:</h3>
+          <ul>
+            <li v-for="expense in expenses" :key="expense.id">
+              {{ expense.description }} - ${{ expense.amount }} ({{ expense.category }})
+            </li>
+          </ul>
+          
         </div>
-  
-        <!-- Add Guest Form -->
-        <h2 class="section-title">Invite Guests</h2>
-        <form @submit.prevent="addGuest" class="guest-form">
-          <input v-model="newGuest.name" type="text" placeholder="Guest Name" required class="guest-input" />
-          <input v-model="newGuest.email" type="email" placeholder="Guest Email" required class="guest-input" />
-          <button type="submit" class="add-guest-button">Add Guest</button>
-        </form>
-  
-        <!-- Guest List -->
-        <h2 class="guest-list-title">Attending Guests ({{ guests.length }})</h2>
-        <ul class="guest-list">
-          <li v-for="guest in guests" :key="guest.id" class="guest-item">
-            {{ guest.name }} - {{ guest.rsvp_status }}
-          </li>
-        </ul>
-  
-        <button @click="sendInvitations" class="send-invitations-button">Send Invitations to All</button>
+        
       </div>
     </div>
-  </template>
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    data() {
+
+    <!-- Right side: Event Details and Guests -->
+    <div class="right-side">
+      <h1 v-if="event" class="event-title">{{ event.title }}</h1>
+
+      <button @click="isEditing = !isEditing" class="edit-event-button">
+        {{ isEditing ? "Cancel Edit" : "Edit Event" }}
+      </button>
+
+      <!-- Event Details Form -->
+      <div v-if="isEditing" class="form-container">
+        <h2 class="form-title">Edit Event</h2>
+        
+        <label for="eventTitle">Title:</label>
+        <input id="eventTitle" v-model="event.title" type="text" class="input-field" />
+        
+        <label for="eventDate">Date:</label>
+        <input id="eventDate" v-model="event.date" type="date" class="input-field" />
+        
+        <label for="eventTime">Time:</label>
+        <input id="eventTime" v-model="event.time" type="time" class="input-field" />
+        
+        <label for="eventLocation">Location:</label>
+        <input id="eventLocation" v-model="event.location" type="text" class="input-field" />
+        
+        <label for="eventImage">Image URL:</label>
+        <input id="eventImage" v-model="event.image" type="text" class="input-field" />
+
+        <button @click="updateEvent" class="save-button">Save Changes</button>
+      </div>
+
+      <!-- Delete Event Button -->
+      <button @click="deleteEvent" class="delete-event-button" v-if="!isEditing">
+        Delete Event
+      </button>
+
+      <!-- Invite Guests -->
+      <h2 class="section-title">Invite Guests</h2>
+      <form @submit.prevent="addGuest" class="guest-form">
+        <input v-model="newGuest.name" type="text" placeholder="Guest Name" required class="guest-input" />
+        <input v-model="newGuest.email" type="email" placeholder="Guest Email" required class="guest-input" />
+        <button type="submit" class="add-guest-button">Add Guest</button>
+      </form>
+
+      <!-- Edit form for the selected guest -->
+<div v-if="guestToEdit" class="edit-form">
+  <h3>Edit Guest</h3>
+  <form @submit.prevent="saveGuestEdit">
+    <div>
+      <label for="name">Name:</label>
+      <input type="text" v-model="guestToEdit.name" id="name" required />
+    </div>
+    <div>
+      <label for="email">Email:</label>
+      <input type="email" v-model="guestToEdit.email" id="email" required />
+    </div>
+    <div>
+      <label for="rsvp_status">RSVP Status:</label>
+      <select v-model="guestToEdit.rsvp_status" id="rsvp_status">
+        <option value="Accepted">Accepted</option>
+        <option value="Declined">Declined</option>
+        <option value="Pending">Pending</option>
+      </select>
+    </div>
+    <button type="submit">Save Changes</button>
+    <button type="button" @click="cancelEdit">Cancel</button>
+  </form>
+</div>
+
+      <h2 class="guest-list-title">Attending Guests ({{ guestCount }})</h2>
+      <ul class="guest-list">
+  <li
+    v-for="guest in guests"
+    :key="guest.id"
+    class="guest-item"
+  >
+    <div class="guest-info">
+      {{ guest.name ? guest.name : "Unknown" }} 
+      ({{ guest.email ? guest.email : "No Email" }}) - 
+      RSVP: {{ guest.rsvp_status ? guest.rsvp_status : "Pending" }}
+    </div>
+
+    <!-- Edit and Delete buttons (visible on hover) -->
+    <div class="guest-actions">
+      <button @click="editGuest(guest)" class="edit-button">Edit</button>
+      <button @click="deleteGuest(guest.id)" class="delete-button">Delete</button>
+    </div>
+  </li>
+</ul>
+
+      <button @click="sendInvitations" class="send-invitations-button">Send Invitations to All</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+
+export default {
+  data() {
+    return {
+      event: null,
+      tasks: [],
+      guests: [],
+      guestToEdit: null,
+      newGuest: { name: "", email: "" },
+      expenses: [],
+      isEditing: false,
+    };
+  },
+  computed: {
+    guestCount() {
+      return this.guests.length;
+    },
+    totalExpenses() {
+      return this.expenses.reduce((total, expense) => total + expense.amount, 0);
+    },
+  },
+  async created() {
+  await this.fetchEvent();  // Ensure event is loaded first
+  await this.fetchGuests(); // Then fetch guests
+  this.fetchExpenses(); // Fetch expenses as usual
+},
+  methods: {
+    getAuthHeaders() {
+      const token = localStorage.getItem("token");
       return {
-        event: null,
-        tasks: [], // For task manager
-        guests: [], // For storing attending guests
-        newGuest: { name: "", email: "" }, // For adding new guests
-        expenses: [], // For storing expenses
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       };
     },
-    created() {
-      this.fetchEvent();
-      this.fetchGuests();
-      this.fetchExpenses(); // Fetch expenses when the component is created
+    async fetchEvent() {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/events/${this.$route.params.id}`,
+          this.getAuthHeaders()
+        );
+        this.event = response.data;
+
+        // Fetch guests and expenses only after event data is available
+        this.fetchGuests();
+        this.fetchExpenses();
+      } catch (error) {
+        console.error("Error fetching event details:", error);
+      }
     },
-    methods: {
-      async fetchEvent() {
+    async updateEvent() {
+  try {
+    // Ensure the event object has all the updated properties
+    const updatedEvent = {
+      name: this.event.title,
+      date: this.event.date,
+      created_at: this.event.time,
+      location: this.event.location,
+      imageUrl: this.event.image,
+    };
+    console.log(updatedEvent);
+
+    // Update event through API
+    await axios.put(
+      `http://localhost:5000/api/events/${this.event.id}`,
+      updatedEvent,
+      this.getAuthHeaders()
+    );
+
+    alert("Event updated successfully");
+    this.isEditing = false;
+    this.fetchEvent(); // Refresh event details after update
+  } catch (error) {
+    console.error("Error updating event:", error);
+  }
+},
+  async deleteEvent() {
+      if (confirm("Are you sure you want to delete this event?")) {
         try {
-          const response = await axios.get(`http://localhost:5000/api/events/${this.$route.params.id}`);
-          this.event = response.data;
+          await axios.delete(
+            `http://localhost:5000/api/events/${this.event.id}`,
+            this.getAuthHeaders()
+          );
+          alert("Event deleted successfully");
+          this.$router.push("/events"); // Redirect to events list after deletion
         } catch (error) {
-          console.error("Error fetching event details:", error);
+          console.error("Error deleting event:", error);
         }
-      },
-      async updateEvent() {
-        try {
-          await axios.put(`http://localhost:5000/api/events/${this.event.id}`, this.event);
-          alert("Event updated successfully");
-        } catch (error) {
-          console.error("Error updating event:", error);
-        }
-      },
-      async fetchGuests() {
-        try {
-          const response = await axios.get(`http://localhost:5000/api/guests/${this.event.id}`);
-          this.guests = response.data;
-        } catch (error) {
-          console.error("Error fetching guests:", error);
-        }
-      },
-      async fetchExpenses() {
-        try {
-          const response = await axios.get(`http://localhost:5000/api/expenses/${this.event.id}`);
-          this.expenses = response.data;
-        } catch (error) {
-          console.error("Error fetching expenses:", error);
-        }
-      },
-      async addGuest() {
-        try {
-          await axios.post("http://localhost:5000/api/guests", {
+      }
+    },
+
+    async fetchGuests() {
+    if (!this.event || !this.event.id) {
+      console.error("Event ID is not available yet");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/guests/${this.event.id}`,
+        this.getAuthHeaders()
+      );
+
+      // Ensure we access the correct key
+      if (response.data && Array.isArray(response.data.guests)) {
+        this.guests = response.data.guests;
+      } else {
+        console.error("Invalid response format for guests:", response.data);
+      }
+
+    } catch (error) {
+      console.error("Error fetching guests:", error);
+    }
+  },
+    async fetchExpenses() {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/expenses/${this.event.id}`,
+          this.getAuthHeaders()
+        );
+        this.expenses = response.data;
+      } catch (error) {
+        console.error("Error fetching expenses:", error);
+      }
+    },
+    async addGuest() {
+      try {
+        await axios.post(
+          "http://localhost:5000/api/guests",
+          {
             event_id: this.event.id,
             name: this.newGuest.name,
             email: this.newGuest.email,
-          });
-          this.newGuest = { name: "", email: "" }; // Reset form fields
-          this.fetchGuests(); // Re-fetch guests
-        } catch (error) {
-          console.error("Error adding guest:", error);
-        }
-      },
-      async sendInvitations() {
-        try {
-          const emails = this.guests.map(guest => guest.email);
-          await axios.post("http://localhost:5000/api/inviteAll", {
+          },
+          this.getAuthHeaders()
+        );
+        this.newGuest = { name: "", email: "" };
+        this.fetchGuests();
+      } catch (error) {
+        console.error("Error adding guest:", error);
+      }
+    },
+    async sendInvitations() {
+      try {
+        const emails = this.guests.map((guest) => guest.email);
+        await axios.post(
+          "http://localhost:5000/api/inviteAll",
+          {
             eventId: this.event.id,
             emails,
-          });
-          alert("Invitations sent to all guests!");
-        } catch (error) {
-          console.error("Error sending invitations:", error);
-        }
-      },
-      addTask() {
-        const newTask = { id: Date.now(), name: "New Task", completed: false };
-        this.tasks.push(newTask);
-      },
-      updateTask(task) {
-        console.log("Task updated:", task);
-      },
-      deleteTask(index) {
-        this.tasks.splice(index, 1);
-      },
-      navigateToExpenses() {
-        this.$router.push(`/expenses/${this.event.id}`);
-      },
+          },
+          this.getAuthHeaders()
+        );
+        alert("Invitations sent to all guests!");
+      } catch (error) {
+        console.error("Error sending invitations:", error);
+      }
     },
-  };
-  </script>
-  
- <style scoped>
+    async deleteGuest(guestId) {
+      if (confirm("Are you sure you want to delete this guest?")) {
+        try {
+          await axios.delete(
+            `http://localhost:5000/api/guests/${guestId}`,
+            this.getAuthHeaders()
+          );
+          alert("Guest deleted successfully");
+          this.fetchGuests(); // Refresh the guest list
+        } catch (error) {
+          console.error("Error deleting guest:", error);
+        }
+      }
+    },
+    async editGuest(guest) {
+      // Set the guest to edit
+      this.guestToEdit = { ...guest };
+      // You can show an edit form here if necessary
+      // This could be done by showing a modal or updating the UI for inline editing
+    },
+    async saveGuestEdit() {
+      try {
+        const updatedGuest = { ...this.guestToEdit };
+        await axios.put(
+          `http://localhost:5000/api/guests/${updatedGuest.id}`,
+          updatedGuest,
+          this.getAuthHeaders()
+        );
+        alert("Guest updated successfully");
+        this.fetchGuests(); // Refresh the guest list
+        this.guestToEdit = null; // Clear edit mode
+      } catch (error) {
+        console.error("Error updating guest:", error);
+      }
+    },
+    cancelEdit(){
+      this.guestToEdit = null;
+    },
+
+    addTask() {
+      this.tasks.push({ id: Date.now(), name: "New Task", completed: false });
+    },
+    deleteTask(index) {
+      this.tasks.splice(index, 1);
+    },
+    navigateToExpenses() {
+      this.$router.push(`/expenses/${this.event.id}`);
+    },
+  },
+};
+</script>
+
+<style scoped>
+.edit-event-button {
+  margin-bottom: 15px;
+  background-color: #f39c12;
+}
+
+.edit-event-button:hover {
+  background-color: #e67e22;
+}
   .event-details-container {
     display: flex;
     justify-content: space-between;
@@ -272,6 +447,52 @@
   .send-invitations-button {
     width: 100%;
   }
+  .edit-form {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  margin-top: 20px;
+  border-radius: 5px;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.edit-form h3 {
+  text-align: center;
+}
+
+.edit-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-form input,
+.edit-form select,
+.edit-form button {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.edit-form button {
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.edit-form button[type="button"] {
+  background-color: #f44336;
+}
+
+.edit-form button:hover {
+  background-color: #45a049;
+}
+
+.edit-form button[type="button"]:hover {
+  background-color: #e53935;
+}
   
   .guest-list {
     list-style: none;
@@ -279,11 +500,39 @@
   }
   
   .guest-item {
-    background-color: #f2f2f2;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
+    position: relative;
   }
+  .guest-actions {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.guest-item:hover .guest-actions {
+  display: block;
+}
+
+.edit-button{
+  margin-left: 5px;
+  padding: 5px;
+  background-color: orange;
+  border: none;
+  cursor: pointer;
+}
+.delete-button {
+  margin-left: 5px;
+  padding: 5px;
+  background-color: red;
+  border: none;
+  cursor: pointer;
+}
+
+.edit-button:hover,
+.delete-button:hover {
+  background-color: #ddd;
+}
   
   .event-title {
     font-size: 2rem;
