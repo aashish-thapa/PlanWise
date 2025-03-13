@@ -11,7 +11,7 @@
         <button @click="deleteTask(index)" class="delete-button">Delete</button>
       </div>
 
-      <button @click="addTask" class="add-button">Add Task</button>
+      <button @click="navigateToTaskManager" class="add-button">Go to Task Manager</button>
 
       <!-- Manage Expenses -->
       <div class="manage-expenses">
@@ -252,23 +252,6 @@ export default {
         console.error("Error fetching expenses:", error);
       }
     },
-    async addGuest() {
-      try {
-        await axios.post(
-          "http://localhost:5000/api/guests",
-          {
-            event_id: this.event.id,
-            name: this.newGuest.name,
-            email: this.newGuest.email,
-          },
-          this.getAuthHeaders()
-        );
-        this.newGuest = { name: "", email: "" };
-        this.fetchGuests();
-      } catch (error) {
-        console.error("Error adding guest:", error);
-      }
-    },
     async sendInvitations() {
       try {
         const emails = this.guests.map((guest) => guest.email);
@@ -323,12 +306,8 @@ export default {
     cancelEdit(){
       this.guestToEdit = null;
     },
-
-    addTask() {
-      this.tasks.push({ id: Date.now(), name: "New Task", completed: false });
-    },
-    deleteTask(index) {
-      this.tasks.splice(index, 1);
+    navigateToTaskManager() {
+      this.$router.push(`/taskmanager/${this.event.id}`);
     },
     navigateToExpenses() {
       this.$router.push(`/expenses/${this.event.id}`);

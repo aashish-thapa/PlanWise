@@ -150,6 +150,7 @@ export default {
         );
         this.newExpense = { description: "", amount: "", category: "decoration" };
         this.fetchExpenses();
+        
       } catch (error) {
         console.error("Error adding expense:", error);
       }

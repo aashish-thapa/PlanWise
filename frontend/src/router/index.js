@@ -22,6 +22,12 @@ const routes = [
     name: "ManageExpenses",
     component: () => import("@/views/ManageExpenses.vue"),
     props: true // Pass route params as props
+  },
+  {
+    path: "/taskmanager/:id",
+    name: "TaskManager",
+    component: () => import("@/views/TaskManager.vue"),
+    props: true // Pass route params as props
   }
 
 ];

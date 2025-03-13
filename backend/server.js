@@ -7,7 +7,7 @@ import eventRoutes from './routes/eventRoutes.js';
 import guestRoutes from './routes/guestRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import authRoutes from './routes/authRoutes.js';
-
+import taskRoutes from './routes/taskRoutes.js'
 dotenv.config();
 const app = express();
 
@@ -28,6 +28,7 @@ app.set('db', db);
 app.use('/api/events', eventRoutes);
 app.use('/api/guests', guestRoutes);
 app.use('/api/expenses', expenseRoutes);
+app.use('api/task', taskRoutes);
 app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
