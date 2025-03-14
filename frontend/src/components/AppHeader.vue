@@ -15,11 +15,11 @@
       
       <!-- Navbar links -->
       <div :class="['nav-links', { 'active': isMenuOpen }]">
-        <router-link to="/" class="nav-link">Home</router-link>
-        <router-link to="/events" class="nav-link">Events</router-link>
-        <router-link v-if="!isLoggedIn" to="/login" class="nav-link login">Login</router-link>
-        <router-link v-if="!isLoggedIn" to="/signup" class="nav-link signup">Sign Up</router-link>
-        <router-link v-if="isLoggedIn" to="/signout" @click.prevent="signOut" class="nav-link signout">Sign Out</router-link>
+        <router-link to="/" class="nav-link" @click="isMenuOpen = false">Home</router-link>
+        <router-link to="/events" class="nav-link" @click="isMenuOpen = false">Events</router-link>
+        <router-link v-if="!isLoggedIn" to="/login" class="nav-link login" @click="isMenuOpen = false">Login</router-link>
+        <router-link v-if="!isLoggedIn" to="/signup" class="nav-link signup" @click="isMenuOpen = false">Sign Up</router-link>
+        <router-link v-if="isLoggedIn" to="/signout" @click.prevent="signOut" class="nav-link signout" @click="isMenuOpen = false">Sign Out</router-link>
       </div>
     </nav>
   </header>
@@ -94,20 +94,46 @@ nav {
 
 .logo img {
   height: 50px; /* Adjust logo size */
+  max-width: 150px;
 }
-
+@media (max-width: 768px) {
+  .logo img {
+    height: 40px; /* Adjust for smaller screens */
+    max-width: 120px;
+  }
+}
+/* Navbar Links */
 /* Navbar Links */
 .nav-links {
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
+@media (max-width: 768px) {
+  .nav-links {
+    display: flex; /* Keep flex but hidden */
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    background-color: white;
+    width: 100%;
+    z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
 
+  .nav-links.active {
+    transform: translateY(0);
+  }
+}
+
+/* Increase gap between nav items */
 .nav-link {
   color: black; /* Black text color */
   text-decoration: none;
   padding: 10px 20px;
-  margin: 0 15px;
+  margin: 0 25px; /* Increased gap between items */
   font-size: 1.2rem;
   font-weight: 600;
   transition: color 0.3s ease, border-bottom 0.3s ease;
@@ -121,6 +147,7 @@ nav {
 .nav-link:active {
   color: #1565c0; /* Darker blue for active state */
 }
+
 .nav-links .signup {
   background-color: #1e88e5; /* Blue background */
   color: white; /* White text */
@@ -135,7 +162,8 @@ nav {
   background-color: #1565c0; /* Darker blue on hover */
   transform: translateY(-3px);
 }
-/* Position login and signup to the right */
+
+/* Adjust positioning of login/signup */
 .nav-links .login,
 .nav-links .signup {
   margin-left: 20px;
@@ -143,13 +171,17 @@ nav {
 
 /* Hamburger Menu Styles */
 .hamburger {
-  display: none;
+  display: none; /* Default, hidden on larger screens */
   flex-direction: column;
   cursor: pointer;
   padding: 10px;
   width: 30px;
   height: 25px;
   justify-content: space-between;
+  position: absolute;
+  top: 15px; /* Adjust top position */
+  right: 20px; /* Space from the right edge */
+  z-index: 1001; /* Ensure it stays above other elements */
 }
 
 .bar {
@@ -159,25 +191,28 @@ nav {
   border-radius: 2px;
 }
 
-/* Responsive Styles */
+/* Make sure the hamburger is visible on small screens */
 @media (max-width: 768px) {
+  .hamburger {
+    display: flex; /* Show hamburger menu on small screens */
+    right: 10px; /* Adjust the right margin to avoid cutoff */
+  }
+
+  /* Ensure nav-links are hidden initially */
   .nav-links {
-    display: none; /* Hide the navbar links by default on small screens */
+    display: none;
     flex-direction: column;
     position: absolute;
     top: 70px;
     left: 0;
-    background-color: white; /* White background */
+    background-color: white;
     width: 100%;
     z-index: 999;
   }
 
+  /* Show the nav links when active */
   .nav-links.active {
-    display: flex; /* Show the navbar links when active */
-  }
-
-  .hamburger {
-    display: flex; /* Show hamburger menu on small screens */
+    display: flex;
   }
 
   .logo {
