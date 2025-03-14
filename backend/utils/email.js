@@ -16,7 +16,7 @@ export const sendEmailInvitation = async (email, name, eventId) => {
         from: process.env.EMAIL_USER,
         to: email,
         subject: 'You are invited to an event!',
-        text: `Hello ${name},\n\nYou have been invited to an event. Click the link below to view details:\n\nhttp://localhost:8080/events/${eventId}`
+        text: `Hello ${name},\n\nYou have been invited to an event. Click the link below to view details:\n\nhttps://wiseplan.vercel.app/events/${eventId}`
     };
 
     try {

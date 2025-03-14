@@ -144,8 +144,12 @@ export default {
   },
   async created() {
     await this.fetchEvent();  // Ensure event is loaded first
+    if (this.event && this.event.id) {
     this.fetchGuests(); // Fetch guests after event is available
     this.fetchExpenses(); // Fetch expenses as usual
+  } else {
+    console.error("Event data is not loaded, cannot fetch expenses");
+  } // Fetch expenses as usual
   },
   methods: {
     getAuthHeaders() {
@@ -288,10 +292,18 @@ export default {
     },
 
     async fetchExpenses() {
+      if (!this.event) {
+        console.error("Event is not loaded yet.");
+        return;
+      }
+
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.get(
           `${backend}/api/expenses/${this.event.id}`,
-          this.getAuthHeaders()
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
         );
         this.expenses = response.data;
       } catch (error) {
