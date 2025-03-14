@@ -13,7 +13,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: "https://event-planner-7o83.vercel.app/",  // Allow specific frontend
+    origin: "*",  // Allow specific frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 }));
