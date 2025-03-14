@@ -32,7 +32,7 @@ The App is live at https://event-planner-7o83.vercel.app/ where you can enjoy ev
 Ensure you have the following installed:
 - Node.js
 - Vue.js (Vue CLI recommended)
-- MySQL or PostgreSQL (for database)
+- MySQL(for database)
 - Backend API (Node.js with Express)
 
 ### Clone the Repository
