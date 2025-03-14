@@ -12,7 +12,11 @@ import taskRoutes from './routes/taskRoutes.js';
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    origin: "https://event-planner-7o83.vercel.app", // Allow specific frontend
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true
+}));
 app.use(bodyParser.json());
 
 // Database connection
