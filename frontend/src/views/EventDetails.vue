@@ -121,6 +121,7 @@
 
 <script>
 import axios from "axios";
+const backend = process.env.VUE_APP_BACKEND || 'http://localhost:5000';
 
 export default {
   data() {
@@ -160,7 +161,7 @@ export default {
     async fetchEvent() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/events/${this.$route.params.id}`,
+          `${backend}/api/events/${this.$route.params.id}`,
           this.getAuthHeaders()
         );
         this.event = response.data;
@@ -179,7 +180,7 @@ export default {
         };
 
         await axios.put(
-          `http://localhost:5000/api/events/${this.event.id}`,
+          `${backend}/api/events/${this.event.id}`,
           updatedEvent,
           this.getAuthHeaders()
         );
@@ -195,7 +196,7 @@ export default {
       if (confirm("Are you sure you want to delete this event?")) {
         try {
           await axios.delete(
-            `http://localhost:5000/api/events/${this.event.id}`,
+            `${backend}/api/events/${this.event.id}`,
             this.getAuthHeaders()
           );
           alert("Event deleted successfully");
@@ -213,7 +214,7 @@ export default {
       }
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/guests/${this.event.id}`,
+          `${backend}/api/guests/${this.event.id}`,
           this.getAuthHeaders()
         );
 
@@ -234,7 +235,7 @@ export default {
 
   try {
     const response = await axios.post(
-      `http://localhost:5000/api/guests`,
+      `${backend}/api/guests`,
       {
         event_id : this.event.id,
         name: this.newGuest.name,
@@ -254,7 +255,7 @@ export default {
     async deleteGuest(guestId) {
       try {
         await axios.delete(
-          `http://localhost:5000/api/guests/${guestId}`,
+          `${backend}/api/guests/${guestId}`,
           this.getAuthHeaders()
         );
         this.guests = this.guests.filter((guest) => guest.id !== guestId);
@@ -270,7 +271,7 @@ export default {
     async saveGuestEdit() {
       try {
         await axios.put(
-          `http://localhost:5000/api/guests/${this.guestToEdit.id}`,
+          `${backend}/api/guests/${this.guestToEdit.id}`,
           this.guestToEdit,
           this.getAuthHeaders()
         );
@@ -290,7 +291,7 @@ export default {
     async fetchExpenses() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/expenses/${this.event.id}`,
+          `${backend}/api/expenses/${this.event.id}`,
           this.getAuthHeaders()
         );
         this.expenses = response.data;

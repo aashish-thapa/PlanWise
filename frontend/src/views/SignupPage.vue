@@ -18,7 +18,8 @@
   
   <script>
   import axios from 'axios';
-  
+  const backend = process.env.VUE_APP_BACKEND || 'http://localhost:5000';
+
   export default {
     name: 'SignupPage',
     data() {
@@ -43,7 +44,7 @@
         };
   
         try {
-          const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+          const response = await axios.post(`${backend}/api/auth/register`, userData);
   
           if (response.status === 201) {
             alert('User registered successfully!');

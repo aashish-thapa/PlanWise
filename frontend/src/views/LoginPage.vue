@@ -16,7 +16,8 @@
   
   <script>
   import axios from 'axios';
-  
+  const backend = process.env.VUE_APP_BACKEND || 'http://localhost:5000';
+
   export default {
     name: 'LoginPage',
     data() {
@@ -29,7 +30,7 @@
       async loginUser() {
         try {
           // Send POST request to the backend for login
-          const response = await axios.post('http://localhost:5000/api/auth/login', {
+          const response = await axios.post(`${VUE_APP_BACKEND}/api/auth/login`, {
             email: this.email,
             password: this.password
           });

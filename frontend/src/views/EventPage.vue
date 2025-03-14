@@ -39,7 +39,8 @@
   
   <script>
   import axios from "axios";
-  
+  const backend = process.env.VUE_APP_BACKEND || 'http://localhost:5000';
+
   export default {
     name: "EventPage",
     data() {
@@ -56,7 +57,7 @@
         try {
           
           const token = localStorage.getItem('token'); // Retrieve stored token
-          const response = await axios.get("http://localhost:5000/api/events", {
+          const response = await axios.get(`${backend}/api/events`, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           });
           console.log(response.data);
