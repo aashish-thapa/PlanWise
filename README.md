@@ -1,7 +1,7 @@
 # PlanWise
 
 PlanWise is your go-to event planning platform that helps you organize and manage events efficiently. With authentication, task management, expense tracking, and guest invitations, PlanWise ensures seamless event coordination.
-
+Live at: https://event-planner-7o83.vercel.app/
 ## Features
 
 ### Authentication
@@ -26,7 +26,7 @@ PlanWise is your go-to event planning platform that helps you organize and manag
 - Track whether invited guests have RSVP'd.
 
 ## Installation
-The App is live at https://event-planner-7o83.vercel.app/ 
+The App is live at https://event-planner-7o83.vercel.app/ where you can enjoy every feature of PlanWise. If you want to run on your own local machine follow this: 
 
 ### Prerequisites
 Ensure you have the following installed:
@@ -87,7 +87,53 @@ EMAIL_PASS=
    ```sh
    npm run start
    ```
+## Schema for database:
+```
+USE DATABASE yourdbname;
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE TABLE guests (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    rsvp_status ENUM('Pending', 'Accepted', 'Declined') DEFAULT 'Pending',
+    user_id INT,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE expenses (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    category VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE tasks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    event_id INT NOT NULL,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 ## Usage
 1. **Sign up/Login** to access PlanWise.
 2. **Create an event** and manage its details.
