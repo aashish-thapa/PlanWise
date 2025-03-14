@@ -68,6 +68,7 @@ import {
   BarController,
 } from "chart.js";
 
+
 // Register Chart.js components
 ChartJS.register(
   CategoryScale,
@@ -78,6 +79,7 @@ ChartJS.register(
   Legend,
   BarController
 );
+const backend = process.env.VUE_APP_ROOT_URL;
 
 export default {
   data() {
@@ -103,7 +105,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/events/${this.$route.params.id}`,
+          `${backend}/api/events/${this.$route.params.id}`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
@@ -125,7 +127,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/expenses/${this.event.id}`,
+          `${backend}/api/expenses/${this.event.id}`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
@@ -145,7 +147,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         await axios.post(
-          "http://localhost:5000/api/expenses",
+          `${backend}/api/expenses`,
           {
             event_id: this.event.id,
             description: this.newExpense.description,

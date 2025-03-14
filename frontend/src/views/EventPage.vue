@@ -39,7 +39,7 @@
   
   <script>
   import axios from "axios";
-  const backend = process.env.VUE_APP_BACKEND || 'http://localhost:5000';
+  const backend = process.env.VUE_APP_ROOT_URL;
 
   export default {
     name: "EventPage",

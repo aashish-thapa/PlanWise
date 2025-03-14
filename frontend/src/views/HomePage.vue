@@ -6,7 +6,7 @@
         <p>Your go-to platform for managing and organizing all your events!</p>
 
         <!-- Conditionally display the button based on login status -->
-        <router-link v-if="isLoggedIn" to="/login" class="btn-primary">Browse Events</router-link>
+        <router-link v-if="isLoggedIn" to="/events" class="btn-primary">Browse Events</router-link>
         <p v-else class="login-prompt">Please log in to browse events.</p>
       </div>
     </header>

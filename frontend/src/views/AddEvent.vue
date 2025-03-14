@@ -31,7 +31,7 @@
   
   <script>
  import axios from 'axios';
-
+ const backend = process.env.VUE_APP_ROOT_URL;
 export default {
   data() {
     return {
@@ -54,7 +54,7 @@ export default {
         return alert("You need to log in first!");
       }
 
-      axios.post('http://localhost:5000/api/events', eventData, {
+      axios.post(`${backend}/api/events`, eventData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

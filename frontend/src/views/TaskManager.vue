@@ -33,7 +33,7 @@
 
 <script>
 import axios from 'axios';
-
+const backend = process.env.VUE_APP_ROOT_URL;
 export default {
   data() {
     return {
@@ -52,7 +52,7 @@ export default {
   methods: {
     async fetchTasks() {
       try {
-        const response = await axios.get(`http://localhost:5000/api/tasks/${this.$route.params.id}`, {
+        const response = await axios.get(`${backend}/api/tasks/${this.$route.params.id}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.tasks = response.data.tasks;
@@ -64,13 +64,13 @@ export default {
       try {
         this.newTask.event_id = this.$route.params.id;
         if (this.isEditing) {
-          await axios.put(`http://localhost:5000/api/tasks/${this.editTaskId}`, this.newTask, {
+          await axios.put(`${backend}/api/tasks/${this.editTaskId}`, this.newTask, {
             headers: { Authorization: `Bearer ${this.token}` }
           });
           this.isEditing = false;
           this.editTaskId = null;
         } else {
-          await axios.post(`http://localhost:5000/api/tasks`, this.newTask, {
+          await axios.post(`${backend}/api/tasks`, this.newTask, {
             headers: { Authorization: `Bearer ${this.token}` }
           });
         }
@@ -82,7 +82,7 @@ export default {
     },
     async deleteTask(taskId) {
       try {
-        await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
+        await axios.delete(`${backend}/api/tasks/${taskId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
         this.fetchTasks();
