@@ -62,7 +62,11 @@
           });
           console.log(response.data);
   
-          this.events = response.data;
+          this.events = response.data.sort((a, b) => {
+            const timeA = new Date(`${a.date}T${a.time}`).getTime();
+            const timeB = new Date(`${b.date}T${b.time}`).getTime();
+            return timeA - timeB; // Sort in ascending order
+      });
         } catch (error) {
           console.error("Error fetching events:", error.response?.data || error.message);
         }
