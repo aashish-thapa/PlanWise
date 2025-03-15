@@ -200,7 +200,7 @@ nav {
 
   .hamburger {
     display: flex; 
-    right: 5%;/* Show hamburger menu on small screens */
+    right: 7%;/* Show hamburger menu on small screens */
   }
 }
 </style>
