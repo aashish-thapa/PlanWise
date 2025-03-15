@@ -42,7 +42,7 @@
         <h2 class="form-title">Edit Event</h2>
         
         <label for="eventTitle">Title:</label>
-        <input id="eventTitle" v-model="event.title" type="text" class="input-field" />
+        <input id="eventTitle" v-model="event.name" type="text" class="input-field" />
         
         <label for="eventDate">Date:</label>
         <input id="eventDate" v-model="event.date" type="date" class="input-field" />
@@ -54,10 +54,11 @@
         <input id="eventLocation" v-model="event.location" type="text" class="input-field" />
         
         <label for="eventImage">Image URL:</label>
-        <input id="eventImage" v-model="event.image" type="text" class="input-field" />
+        <input id="eventImage" v-model="event.imageUrl" type="text" class="input-field" />
 
         <button @click="updateEvent" class="save-button">Save Changes</button>
       </div>
+      <LoadingComponent :loading="loading" message="processing...." />
 
       <!-- Delete Event Button -->
       <button @click="deleteEvent" class="delete-event-button" v-if="!isEditing">
@@ -122,7 +123,13 @@
 <script>
 import axios from "axios";
 const backend = process.env.VUE_APP_ROOT_URL;
+import LoadingComponent from "@/components/LoadingComponent.vue";
+import { useToast } from "vue-toastification";
+
 export default {
+  components: {
+    LoadingComponent
+  },
   data() {
     return {
       event: null,
@@ -132,7 +139,12 @@ export default {
       newGuest: { name: "", email: "" },
       expenses: [],
       isEditing: false,
+      loading: false,
     };
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   computed: {
     guestCount() {
@@ -143,13 +155,13 @@ export default {
     },
   },
   async created() {
-    await this.fetchEvent();  // Ensure event is loaded first
+    await this.fetchEvent();
     if (this.event && this.event.id) {
-    this.fetchGuests(); // Fetch guests after event is available
-    this.fetchExpenses(); // Fetch expenses as usual
-  } else {
-    console.error("Event data is not loaded, cannot fetch expenses");
-  } // Fetch expenses as usual
+      this.fetchGuests();
+      this.fetchExpenses();
+    } else {
+      console.error("Event data is not loaded, cannot fetch guests or expenses.");
+    }
   },
   methods: {
     getAuthHeaders() {
@@ -169,17 +181,19 @@ export default {
         );
         this.event = response.data;
       } catch (error) {
-        console.error("Error fetching event details:", error);
+        console.error("Error fetching event details:", error.message);
+        this.toast.error("Error fetching event details.");
       }
     },
     async updateEvent() {
+      this.loading = true;
       try {
         const updatedEvent = {
-          title: this.event.title,
+          name: this.event.name,
           date: this.event.date,
           time: this.event.time,
           location: this.event.location,
-          image: this.event.image,
+          image: this.event.imageUrl,
         };
 
         await axios.put(
@@ -188,31 +202,36 @@ export default {
           this.getAuthHeaders()
         );
 
-        alert("Event updated successfully");
+        this.toast.success("Event updated successfully");
         this.isEditing = false;
-        this.fetchEvent(); // Refresh event details after update
+        await this.fetchEvent();
       } catch (error) {
-        console.error("Error updating event:", error);
+        console.error("Error updating event:", error.message);
+        this.toast.error("Error updating event.");
+      } finally {
+        this.loading = false;
       }
     },
     async deleteEvent() {
-      if (confirm("Are you sure you want to delete this event?")) {
-        try {
-          await axios.delete(
-            `${backend}/api/events/${this.event.id}`,
-            this.getAuthHeaders()
-          );
-          alert("Event deleted successfully");
-          this.$router.push("/events"); // Redirect to events list after deletion
-        } catch (error) {
-          console.error("Error deleting event:", error);
-        }
+      if (!confirm("Are you sure you want to delete this event?")) return;
+      this.loading = true;
+      try {
+        await axios.delete(
+          `${backend}/api/events/${this.event.id}`,
+          this.getAuthHeaders()
+        );
+        this.toast.success("Event deleted successfully");
+        this.$router.push("/events");
+      } catch (error) {
+        console.error("Error deleting event:", error.message);
+        this.toast.error("Error deleting event.");
+      } finally {
+        this.loading = false;
       }
     },
-
     async fetchGuests() {
       if (!this.event || !this.event.id) {
-        console.error("Event ID is not available yet");
+        console.error("Event ID is not available yet.");
         return;
       }
       try {
@@ -227,34 +246,34 @@ export default {
           console.error("Invalid response format for guests:", response.data);
         }
       } catch (error) {
-        console.error("Error fetching guests:", error);
+        console.error("Error fetching guests:", error.message);
       }
     },
     async addGuest() {
-  if (!this.event) {
-    alert("Event not loaded, cannot add guest.");
-    return;
-  }
+      if (!this.event) {
+        this.toast.error("Event not loaded, cannot add guest.");
+        return;
+      }
 
-  try {
-    const response = await axios.post(
-      `${backend}/api/guests`,
-      {
-        event_id : this.event.id,
-        name: this.newGuest.name,
-        email: this.newGuest.email,
-      },
-      this.getAuthHeaders()
-    );
-    console.log("API Response: ", response.data);
-    this.newGuest = { name: "", email: "" }; // Reset form
-    this.fetchGuests(); // Refresh guest list after adding a new guest
-  } catch (error) {
-    console.error("Error adding guest:", error);
-  }
-}
-    ,
+      try {
+        await axios.post(
+          `${backend}/api/guests`,
+          {
+            event_id: this.event.id,
+            name: this.newGuest.name,
+            email: this.newGuest.email,
+          },
+          this.getAuthHeaders()
+        );
 
+        this.newGuest = { name: "", email: "" };
+        this.toast.success("Guest added successfully");
+        this.fetchGuests();
+      } catch (error) {
+        console.error("Error adding guest:", error.message);
+        this.toast.error("Error adding guest.");
+      }
+    },
     async deleteGuest(guestId) {
       try {
         await axios.delete(
@@ -262,15 +281,15 @@ export default {
           this.getAuthHeaders()
         );
         this.guests = this.guests.filter((guest) => guest.id !== guestId);
+        this.toast.success("Guest deleted successfully");
       } catch (error) {
-        console.error("Error deleting guest:", error);
+        console.error("Error deleting guest:", error.message);
+        this.toast.error("Error deleting guest.");
       }
     },
-
     editGuest(guest) {
       this.guestToEdit = { ...guest };
     },
-
     async saveGuestEdit() {
       try {
         await axios.put(
@@ -281,43 +300,38 @@ export default {
         this.guests = this.guests.map((guest) =>
           guest.id === this.guestToEdit.id ? this.guestToEdit : guest
         );
-        this.guestToEdit = null; // Reset edit form
+        this.toast.success("Guest updated successfully");
+        this.guestToEdit = null;
       } catch (error) {
-        console.error("Error saving guest edit:", error);
+        console.error("Error saving guest edit:", error.message);
+        this.toast.error("Error updating guest.");
       }
     },
-
     cancelEdit() {
       this.guestToEdit = null;
     },
-
     async fetchExpenses() {
-      if (!this.event) {
+      if (!this.event || !this.event.id) {
         console.error("Event is not loaded yet.");
         return;
       }
 
       try {
-        const token = localStorage.getItem("token");
         const response = await axios.get(
           `${backend}/api/expenses/${this.event.id}`,
-          {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          }
+          this.getAuthHeaders()
         );
         this.expenses = response.data;
       } catch (error) {
-        console.error("Error fetching expenses:", error);
+        console.error("Error fetching expenses:", error.message);
       }
     },
-
     navigateToTaskManager() {
       this.$router.push({ name: "TaskManager" });
     },
     navigateToExpenses() {
       this.$router.push({ name: "Expenses" });
     },
-
     sendInvitations() {
       alert("Sending invitations...");
       // Implement sending invitations
@@ -325,6 +339,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style scoped>

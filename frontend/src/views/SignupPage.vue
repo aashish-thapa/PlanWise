@@ -9,11 +9,8 @@
         <input type="password" v-model="confirmPassword" placeholder="Confirm Password" required />
         <button type="submit" class="btn-signup" :disabled="loading">Sign Up</button>
       </form>
-      <!-- Loading Spinner -->
-      <div v-if="loading" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Signing up...</p>
-      </div>
+      <LoadingComponent :loading="loading" message="Signing Up.." /> 
+      
       <p class="login-prompt">
         Already have an account? <router-link to="/login" class="login-link">Log in</router-link>
       </p>
@@ -24,10 +21,14 @@
 <script>
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 const backend = process.env.VUE_APP_ROOT_URL;
 
 export default {
   name: 'SignupPage',
+  components: {
+    LoadingComponent
+  },
   data() {
     return {
       name: '',
@@ -140,32 +141,4 @@ button:hover {
   text-decoration: underline;
 }
 
-/* Loading Overlay */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 1;
-}
-
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #5c6bc0;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 </style>

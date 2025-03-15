@@ -26,7 +26,8 @@
             <img :src="event.image_url" :alt="event.name"/>
             <div class="event-info">
               <h3>{{ event.name }}</h3>
-              <p>{{ event.date }}</p>
+              <p class="event-date">{{ formatDate(event.date) }} || {{ formatTime(event.time) }}</p>
+              <p class="event-location">📍<strong>Location:</strong> {{ event.location }}</p>
               <router-link :to="`/event/${event.id}`" class="btn-view-event">
                 View Details
               </router-link>            
@@ -71,7 +72,18 @@
           console.error("Error fetching events:", error.response?.data || error.message);
         }
       },
+      formatDate(dateString){
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+      },
+      formatTime(timeString){
+        if (!timeString) return "Invalid Time";
+      const [hours, minutes] = timeString.split(":");
+      const date = new Date();
+      date.setHours(hours, minutes);
+      return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
     },
+      }
   };
   </script>
   

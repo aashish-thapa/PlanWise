@@ -5,13 +5,13 @@ const router = express.Router();
 
 // Create Event
 router.post('/', authenticateUser, async (req, res) => {
-    const { name, date, location, imageUrl } = req.body; // Add imageUrl
+    const { name, date, time, location, imageUrl } = req.body; // Add time
     const db = req.app.get('db');
 
     try {
-        // Insert event with imageUrl
-        await db.query('INSERT INTO events (user_id, name, date, location, image_url) VALUES (?, ?, ?, ?, ?)', 
-                      [req.user.id, name, date, location, imageUrl]);
+        // Insert event with time
+        await db.query('INSERT INTO events (user_id, name, date, time, location, image_url) VALUES (?, ?, ?, ?, ?, ?)', 
+                      [req.user.id, name, date, time, location, imageUrl]);
         res.status(201).json({ message: 'Event created successfully' });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
 
 // Update Event
 router.put('/:id', authenticateUser, async (req, res) => {
-    const { name, date, location, imageUrl } = req.body; // Add imageUrl
+    const { name, date, time, location, imageUrl } = req.body; // Add time
     const db = req.app.get('db');
     const eventId = req.params.id;
 
@@ -62,8 +62,8 @@ router.put('/:id', authenticateUser, async (req, res) => {
         }
 
         // Update the event
-        await db.query('UPDATE events SET name = ?, date = ?, location = ?, image_url = ? WHERE id = ? AND user_id = ?',
-                       [name, date, location, imageUrl, eventId, req.user.id]);
+        await db.query('UPDATE events SET name = ?, date = ?, time = ?, location = ?, image_url = ? WHERE id = ? AND user_id = ?',
+                       [name, date, time, location, imageUrl, eventId, req.user.id]);
 
         res.json({ message: 'Event updated successfully' });
     } catch (error) {

@@ -9,11 +9,9 @@
           Login
         </button>
       </form>
-      <!-- Loading Spinner -->
-      <div v-if="loading" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Logging in...</p>
-      </div>
+
+      <LoadingComponent :loading="loading" message="Logging in..." />
+      
       <p class="signup-prompt">
         Don't have an account? <router-link to="/signup" class="signup-link">Sign up</router-link>
       </p>
@@ -24,10 +22,14 @@
 <script>
 import axios from 'axios';
 import { useToast } from 'vue-toastification';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 const backend = process.env.VUE_APP_ROOT_URL;
 
 export default {
   name: 'LoginPage',
+  components: {
+    LoadingComponent
+  },
   data() {
     return {
       email: '',
@@ -45,14 +47,14 @@ export default {
           email: this.email,
           password: this.password
         });
-
+        toast.success('Login Successful! Welcome back!')
         // Store token in localStorage for future use
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('isLoggedIn', true);
 
         // Set user data in Vuex store or wherever needed
         this.$store.commit('setUser', { email: this.email });
-        toast.success('Login Successful! Welcome back!')
+        
 
         // Redirect to homepage or another authenticated page
         this.$router.push('/events');
@@ -135,32 +137,5 @@ button:hover {
   text-decoration: underline;
 }
 
-/* Loading Overlay */
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 1;
-}
 
-.spinner {
-  border: 4px solid rgba(255, 255, 255, 0.3);
-  border-top: 4px solid #5c6bc0;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 </style>
