@@ -43,13 +43,16 @@ footer {
   color: white;
   padding: 30px 20px;
   font-family: Arial, sans-serif;
+  width: 100%;
 }
 
 .footer-content {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  margin-bottom: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
   gap: 30px;
 }
 
@@ -130,6 +133,8 @@ footer {
 
 @media (max-width: 768px) {
   .footer-content {
+    max-width: 100%;
+    padding: 0 15px;
     flex-direction: column;
     align-items: center;
   }

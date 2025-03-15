@@ -190,7 +190,38 @@ export default {
   margin: 0 auto;
   line-height: 1.5;
 }
+@media (max-width: 768px) {
+  .hero {
+    padding: 15vh 10vw;
+    height: auto;
+  }
+  
+  .hero-text h1 {
+    font-size: 5vw;
+  }
 
+  .hero-text p {
+    font-size: 3.5vw;
+  }
+
+  .hero .btn-primary {
+    font-size: 3.5vw;
+    padding: 10px 15vw;
+  }
+
+  .features h2, .about h2 {
+    font-size: 5vw;
+  }
+
+  .card {
+    width: 90%;
+    max-width: 350px;
+  }
+
+  .about p {
+    font-size: 3vw;
+  }
+}
 /* Footer Section */
 footer {
   background-color: #0056b3; /* Blue Background */

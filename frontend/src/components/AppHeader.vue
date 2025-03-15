@@ -25,7 +25,6 @@
   </header>
 </template>
 
-
 <script>
 import { watch } from "vue";
 import { useRoute } from "vue-router";
@@ -65,8 +64,6 @@ export default {
 };
 </script>
 
-
-
 <style scoped>
 /* General Styles for Header */
 header {
@@ -79,7 +76,6 @@ header {
   left: 0;
   width: 100%;
   z-index: 1000;
-  margin-top: 0;
 }
 
 nav {
@@ -96,39 +92,7 @@ nav {
   height: 50px; /* Adjust logo size */
   max-width: 150px;
 }
-@media (max-width: 768px) {
-  .logo img {
-    height: 40px; /* Adjust for smaller screens */
-    max-width: 120px;
-  }
-}
-/* Navbar Links */
-/* Navbar Links */
-.nav-links {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
-@media (max-width: 768px) {
-  .nav-links {
-    display: flex; /* Keep flex but hidden */
-    flex-direction: column;
-    position: absolute;
-    top: 70px;
-    left: 0;
-    background-color: white;
-    width: 100%;
-    z-index: 999;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease-in-out;
-  }
 
-  .nav-links.active {
-    transform: translateY(0);
-  }
-}
-
-/* Increase gap between nav items */
 .nav-link {
   color: black; /* Black text color */
   text-decoration: none;
@@ -163,7 +127,6 @@ nav {
   transform: translateY(-3px);
 }
 
-/* Adjust positioning of login/signup */
 .nav-links .login,
 .nav-links .signup {
   margin-left: 20px;
@@ -191,16 +154,34 @@ nav {
   border-radius: 2px;
 }
 
-/* Make sure the hamburger is visible on small screens */
+@media (max-width: 1250px){
+  .nav-links{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+  }
+  .nav-link{
+    padding: 8px 15px;
+    font-size: 1rem;
+    margin: 5px 10px;
+  }
+  .nav-links .signup{
+    margin-right: 10px;
+    padding: 8px 15px;
+  }
+}
+
 @media (max-width: 768px) {
-  .hamburger {
-    display: flex; /* Show hamburger menu on small screens */
-    right: 10px; /* Adjust the right margin to avoid cutoff */
+  .logo img {
+    height: 40px; /* Adjust for smaller screens */
+    max-width: 120px;
   }
 
-  /* Ensure nav-links are hidden initially */
   .nav-links {
-    display: none;
+    display: none; /* Hidden by default on small screens */
     flex-direction: column;
     position: absolute;
     top: 70px;
@@ -208,15 +189,18 @@ nav {
     background-color: white;
     width: 100%;
     z-index: 999;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
   }
 
-  /* Show the nav links when active */
   .nav-links.active {
     display: flex;
+    transform: translateY(0);
   }
 
-  .logo {
-    display: block;
+  .hamburger {
+    display: flex; 
+    right: 6%;/* Show hamburger menu on small screens */
   }
 }
 </style>
