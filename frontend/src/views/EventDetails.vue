@@ -338,7 +338,7 @@ export default {
       try{
         const emails = this.guests.map((guest) => guest.email);
         const response = await axios.post(
-          `${backend}/api/events/inviteAll`, 
+          `${backend}/api/guests/inviteAll`, 
         {
           eventId : this.event.id,
           emails:emails,
