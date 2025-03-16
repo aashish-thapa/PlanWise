@@ -34,7 +34,7 @@
 
     <section class="about">
       <h2>About Us</h2>
-      <p>At Event Organizer, we aim to provide a comprehensive event management solution that helps individuals and organizations efficiently plan, execute, and manage their events. Whether it’s a personal celebration, corporate gathering, or community event, we’re here to make the process seamless and enjoyable.</p>
+      <p>At PlanWise, we aim to provide a comprehensive event management solution that helps individuals and organizations efficiently plan, execute, and manage their events. Whether it’s a personal celebration, corporate gathering, or community event, we’re here to make the process seamless and enjoyable.</p>
     </section>
   </div>
 </template>
