@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
 
 // Update Event
 router.put('/:id', authenticateUser, async (req, res) => {
-    const { name, date, time, location, imageUrl } = req.body; // Add time
+    const { name, date, time, location, image_url } = req.body; // Add time
     const db = req.app.get('db');
     const eventId = req.params.id;
 

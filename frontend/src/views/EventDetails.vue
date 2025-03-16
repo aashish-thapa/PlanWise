@@ -193,7 +193,7 @@ export default {
           date: this.event.date,
           time: this.event.time,
           location: this.event.location,
-          image: this.event.imageUrl,
+          imageUrl: this.event.imageUrl,
         };
 
         await axios.put(

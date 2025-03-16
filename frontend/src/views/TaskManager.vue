@@ -7,20 +7,19 @@
       <input type="date" v-model="newTask.due_date" required />
       <button type="submit">{{ isEditing ? "Update Task" : "Add Task" }}</button>
     </form>
-
+    <LoadingComponent :loading="loading" message="Processing task..." />
     <div v-if="tasks.length > 0" class="task-list">
       <h3>Your Tasks</h3>
       <ul>
         <li v-for="task in tasks" :key="task.id" class="task-item">
           <div class="task-content">
             <strong>{{ task.title }}</strong>
-            <span class="due-date">{{ task.due_date }}</span>
+            <span class="due-date">{{ formatDate(task.due_date)}}</span>
             <p>{{ task.description }}</p>
           </div>
-          <!-- These action buttons will only appear on hover -->
           <div class="task-actions">
             <button class="edit-btn" @click="loadTaskForEdit(task)">Edit</button>
-            <button class="delete-btn" @click="deleteTask(task.id)">Delete</button>
+            <button class="delete-btn" @click="deleteTask(task.id)">Done</button>
           </div>
         </li>
       </ul>
@@ -32,12 +31,20 @@
 </template>
 
 <script>
+import LoadingComponent from '@/components/LoadingComponent.vue';
 import axios from 'axios';
+import { useToast } from 'vue-toastification';
+
 const backend = process.env.VUE_APP_ROOT_URL;
+
 export default {
+  components: {
+    LoadingComponent
+  },
   data() {
     return {
       tasks: [],
+      loading: false,
       newTask: {
         event_id: '',
         title: '',
@@ -49,18 +56,33 @@ export default {
       token: localStorage.getItem('token') || ''
     };
   },
+  setup() {
+    const toast = useToast();
+    return { toast };
+  },
   methods: {
+    formatDate(dateString){
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  },
     async fetchTasks() {
+      this.loading = true;
       try {
         const response = await axios.get(`${backend}/api/tasks/${this.$route.params.id}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
-        this.tasks = response.data.tasks;
+        this.tasks = response.data.tasks.map(task => ({
+      ...task,
+      due_date: new Date(task.due_date) // Ensure the date is parsed as a Date object
+    })).sort((a, b) => a.due_date - b.due_date);
+        this.loading = false;
       } catch (error) {
-        console.error('Error fetching tasks:', error);
+        this.loading = false;
+        this.toast.error('Error fetching tasks');
       }
     },
     async addTask() {
+      this.loading = true;
       try {
         this.newTask.event_id = this.$route.params.id;
         if (this.isEditing) {
@@ -69,25 +91,33 @@ export default {
           });
           this.isEditing = false;
           this.editTaskId = null;
+          this.toast.success('Task updated successfully');
         } else {
           await axios.post(`${backend}/api/tasks`, this.newTask, {
             headers: { Authorization: `Bearer ${this.token}` }
           });
+          this.toast.success('Task added successfully');
         }
         this.fetchTasks();
         this.resetTaskForm();
       } catch (error) {
-        console.error('Error saving task:', error);
+        this.toast.error('Error saving task');
+      } finally {
+        this.loading = false;
       }
     },
     async deleteTask(taskId) {
+      this.loading = true;
       try {
         await axios.delete(`${backend}/api/tasks/${taskId}`, {
           headers: { Authorization: `Bearer ${this.token}` }
         });
+        this.toast.success('Task deleted successfully');
         this.fetchTasks();
       } catch (error) {
-        console.error('Error deleting task:', error);
+        this.toast.error('Error deleting task');
+      } finally {
+        this.loading = false;
       }
     },
     loadTaskForEdit(task) {
@@ -101,9 +131,11 @@ export default {
   },
   mounted() {
     this.fetchTasks();
-  }
+  },
+  
 };
 </script>
+
 
 <style scoped>
 .task-manager {
@@ -164,6 +196,7 @@ export default {
 }
 
 .due-date {
+  padding: 5%;
   font-size: 0.9em;
   color: #888;
 }

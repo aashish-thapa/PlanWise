@@ -29,7 +29,7 @@
               <p class="event-date">{{ formatDate(event.date) }} || {{ formatTime(event.time) }}</p>
               <p class="event-location">📍<strong>Location:</strong> {{ event.location }}</p>
               <router-link :to="`/event/${event.id}`" class="btn-view-event">
-                View Details
+                View Details 
               </router-link>            
             </div>
           </div>

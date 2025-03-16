@@ -38,6 +38,7 @@ export default {
       loading: false // Add loading state
     };
   },
+  
   methods: {
     async signupUser() {
       if (this.password !== this.confirmPassword) {

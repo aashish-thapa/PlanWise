@@ -19,11 +19,13 @@
           <option value="food">Food</option>
           <option value="venue">Venue</option>
           <option value="entertainment">Entertainment</option>
+          <option value="beverages">Beverages</option>
           <option value="other">Other</option>
         </select>
 
         <button type="submit">Add Expense</button>
       </form>
+      <LoadingComponent :loading="loading" message="Adding Expenses..." />
     </div>
 
     <!-- Expenses List -->
@@ -35,9 +37,10 @@
         <span class="amount">${{ parseFloat(expense.amount).toFixed(2) }}</span>
         <span class="category">{{ expense.category }}</span>
 
-        <!-- Show additional details on hover -->
-        <div v-if="hoveredExpense && hoveredExpense.id === expense.id" class="hover-details">
-          <p><strong>Details:</strong> Additional information about the expense goes here.</p>
+        <!-- Edit and Delete Buttons -->
+        <div v-if="hoveredExpense && hoveredExpense.id === expense.id" class="expense-actions">
+          <button @click="editExpense(expense)">Edit</button>
+          <button @click="deleteExpense(expense.id)">Delete</button>
         </div>
       </li>
     </ul>
@@ -45,6 +48,32 @@
     <!-- Total Expenses -->
     <div class="total-expenses">
       <h2>Total Expenses: ${{ totalExpenses.toFixed(2) }}</h2>
+    </div>
+
+    <!-- Edit Expense Modal -->
+    <div v-if="editingExpense" class="edit-expense-modal">
+      <div class="modal-content">
+        <h2>Edit Expense</h2>
+        <form @submit.prevent="updateExpense">
+          <label>Description:</label>
+          <input v-model="editingExpense.description" type="text" required />
+
+          <label>Amount:</label>
+          <input v-model="editingExpense.amount" type="number" min="0" step="0.01" required />
+
+          <label>Category:</label>
+          <select v-model="editingExpense.category" required>
+            <option value="decoration">Decoration</option>
+            <option value="food">Food</option>
+            <option value="venue">Venue</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="other">Other</option>
+          </select>
+
+          <button type="submit">Update Expense</button>
+          <button type="button" @click="cancelEdit">Cancel</button>
+        </form>
+      </div>
     </div>
 
     <!-- Chart for Expenses -->
@@ -57,6 +86,7 @@
 
 <script>
 import axios from "axios";
+import LoadingComponent from "@/components/LoadingComponent.vue";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -67,7 +97,7 @@ import {
   Legend,
   BarController,
 } from "chart.js";
-
+import { useToast } from "vue-toastification";
 
 // Register Chart.js components
 ChartJS.register(
@@ -79,9 +109,13 @@ ChartJS.register(
   Legend,
   BarController
 );
+
 const backend = process.env.VUE_APP_ROOT_URL;
 
 export default {
+  components: {
+    LoadingComponent,
+  },
   data() {
     return {
       event: null,
@@ -89,16 +123,21 @@ export default {
       newExpense: { description: "", amount: "", category: "decoration" },
       hoveredExpense: null,
       chartInstance: null, // To hold the chart instance for updating
+      loading: false,
+      editingExpense: null, // For handling the expense edit modal
     };
   },
   computed: {
-    // Compute total expenses dynamically
     totalExpenses() {
       return this.expenses.reduce((sum, exp) => sum + parseFloat(exp.amount || 0), 0);
     },
   },
   created() {
     this.fetchEvent();
+  },
+  setup() {
+    const toast = useToast();
+    return { toast };
   },
   methods: {
     async fetchEvent() {
@@ -146,6 +185,7 @@ export default {
 
       try {
         const token = localStorage.getItem("token");
+        this.loading = true;
         await axios.post(
           `${backend}/api/expenses`,
           {
@@ -158,10 +198,60 @@ export default {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }
         );
+        
+        this.loading = false;
+        this.toast.success("Expenses added successfully");
         this.newExpense = { description: "", amount: "", category: "decoration" };
         this.fetchExpenses();
       } catch (error) {
-        console.error("Error adding expense:", error);
+        this.toast.error("Error adding expense:", error);
+      } finally{
+        this.loading = false;
+      }
+    },
+    async editExpense(expense) {
+      this.editingExpense = { ...expense }; // Make a copy for editing
+    },
+    async updateExpense() {
+      try {
+        this.loading = true;
+        const token = localStorage.getItem("token");
+        await axios.put(
+          `${backend}/api/expenses/${this.editingExpense.id}`,
+          this.editingExpense,
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
+        this.loading=false;
+        this.toast.success("Expenses updated successfully");
+        this.fetchExpenses();
+        this.editingExpense = null; // Close the edit modal after update
+      } catch (error) {
+        this.toast.error("Error updating expense:", error);
+      }
+    },
+    cancelEdit() {
+      this.editingExpense = null; // Close the edit modal without saving
+    },
+    async deleteExpense(expenseId) {
+      if (confirm("Are you sure you want to delete this expense?")) {
+        try {
+          this.loading= true;
+          const token = localStorage.getItem("token");
+          await axios.delete(
+            `${backend}/api/expenses/${expenseId}`,
+            {
+              headers: token ? { Authorization: `Bearer ${token}` } : {},
+            }
+          );
+          this.loading=false;
+          this.toast.success("Expenses deleted successfully.")
+          this.fetchExpenses(); // Refresh expenses after delete
+        } catch (error) {
+          this.toast.error("Error deleting expense:", error);
+          this.loading = false;
+        }
       }
     },
     createChart() {
@@ -176,6 +266,28 @@ export default {
           .reduce((acc, exp) => acc + parseFloat(exp.amount), 0)
       );
 
+      // Define colors for each category
+      const categoryColors = {
+        decoration: "rgba(75, 192, 192, 0.2)",
+        food: "rgba(255, 99, 132, 0.2)",
+        venue: "rgba(54, 162, 235, 0.2)",
+        entertainment: "rgba(153, 102, 255, 0.2)",
+        other: "rgba(255, 159, 64, 0.2)"
+      };
+
+      const borderColor = {
+        decoration: "rgba(75, 192, 192, 1)",
+        food: "rgba(255, 99, 132, 1)",
+        venue: "rgba(54, 162, 235, 1)",
+        entertainment: "rgba(153, 102, 255, 1)",
+        
+        other: "rgba(255, 159, 64, 1)"
+      };
+
+      // Map each category to its corresponding color
+      const backgroundColors = categories.map((category) => categoryColors[category]);
+      const borderColors = categories.map((category) => borderColor[category]);
+
       const ctx = document.getElementById("expenseChart").getContext("2d");
       this.chartInstance = new ChartJS(ctx, {
         type: "bar",
@@ -183,18 +295,26 @@ export default {
           labels: categories,
           datasets: [
             {
-              label: "Expense Amount",
+              label: "Expense Amount ($)",
               data: amounts,
-              backgroundColor: "rgba(75, 192, 192, 0.2)",
-              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: backgroundColors,
+              borderColor: borderColors,
               borderWidth: 1,
             },
           ],
         },
         options: {
           responsive: true,
-          scales: {
-            y: { beginAtZero: true },
+          plugins: {
+            title: {
+              display: true,
+              text: "Expense Distribution by Category",
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => `${context.raw.toFixed(2)} $`,
+              },
+            },
           },
         },
       });
@@ -203,7 +323,11 @@ export default {
 };
 </script>
 
+
+
+
 <style scoped>
+/* Style for the edit modal */
 .manage-expenses-container {
   padding: 20px;
   max-width: 1200px;
@@ -337,5 +461,38 @@ button:hover {
   height: auto;
   margin-top: 30px;
   text-align: center;
+}
+.edit-expense-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 </style>
