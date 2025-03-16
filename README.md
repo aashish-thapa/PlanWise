@@ -76,13 +76,14 @@ DB_USER=
 DB_PASS=
 DB_NAME=
 JWT_SECRET=
-EMAIL_USER=
-EMAIL_PASS=
+ETHEREAL_USER=(for sending email invitations only)
+ETHEREAL_PASS=
 
 
 
 
 ```
+For generating ethereal user and pass : https://ethereal.email/
 3. Start the backend server:
    ```sh
    npm run start
