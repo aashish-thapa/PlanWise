@@ -2,7 +2,7 @@
   <div class="home-container">
     <header class="hero">
       <div class="hero-text">
-        <h1>Welcome to Event Organizer</h1>
+        <h1>Welcome to PlanWise</h1>
         <p>Your go-to platform for managing and organizing all your events!</p>
 
         <!-- Conditionally display the button based on login status -->
@@ -63,10 +63,10 @@ export default {
 .hero {
   position: relative;
   background-color: #082d55; /* Blue Background */
-  color: white;
+  color: #0056b3;
   padding: 150px 40px;
   text-align: center;
-  background-image: url('https://pinkcaviar.com.au/wp-content/uploads/2022/09/Professional-and-Stress-Free-Event-Management-Banner-1.jpg');
+  background-image: url('https://images.theeventscalendar.com/uploads/2023/05/The-Benefits-of-Hiring-a-Professional-Event-Planner.jpg');
   background-size: cover;
   background-position: center;
   height: 77vh; /* Full viewport height */
