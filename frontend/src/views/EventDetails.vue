@@ -140,6 +140,7 @@ export default {
       expenses: [],
       isEditing: false,
       loading: false,
+      isSendingInvitations : false,
     };
   },
   setup() {
@@ -332,9 +333,24 @@ export default {
     navigateToExpenses() {
       this.$router.push({ name: "Expenses" });
     },
-    sendInvitations() {
-      alert("Sending invitations...");
-      // Implement sending invitations
+    async sendInvitations() {
+      this.isSendingInvitations = true;
+      try{
+        const emails = this.guests.map((guest) => guest.email);
+        const response = await axios.post(`${backend}/api/events/inviteAll`, {
+          eventId : this.event.id,
+          emails:emails,
+        },
+      this.getAuthHeaders());
+
+      this.toast.success("Invitations sent successfully!");
+      console.log("Invitations sent", response.data);
+      } catch (error){
+        console.error("error sending invitations: ", error.message);
+        this.toast.error("failed to send invitations");
+      }finally{
+        this.isSendingInvitations = false;
+      }
     },
   },
 };
