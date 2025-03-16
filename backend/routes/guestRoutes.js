@@ -49,11 +49,14 @@ router.get('/:event_id', authenticateUser, async (req, res) => {
 
 // Invite all guests for an event
 router.post('/inviteAll', authenticateUser, async (req, res) => {
-    const { eventId, emails } = req.body;
+    const { eventId, emails, name, date, time, location } = req.body;
 
     try {
+        if (!eventId || !emails || !emails.length || !name || !date || !time || !location) {
+            return res.status(400).json({ message: "Missing required event details or email list" });
+          }
         for (let email of emails) {
-            await sendEmailInvitation(email, 'Guest Name', eventId); 
+            await sendEmailInvitation(email, name, location, date, time); 
         }
         res.status(200).json({ message: "Invitations sent to all guests!" });
     } catch (error) {

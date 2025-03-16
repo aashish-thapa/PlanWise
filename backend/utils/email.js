@@ -5,7 +5,8 @@ dotenv.config();
 
 export const sendEmailInvitation = async (email, name, eventId) => {
     const transporter = nodemailer.createTransport({
-        service: 'Gmail',
+        host: 'live.smtp.mailtrap.io',
+        port: 587,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
@@ -13,7 +14,7 @@ export const sendEmailInvitation = async (email, name, eventId) => {
     });
 
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: 'aashishthapa520@gmail.com',
         to: email,
         subject: 'You are invited to an event!',
         text: `Hello ${name},\n\nYou have been invited to an event. Click the link below to view details:\n\nhttps://wiseplan.vercel.app/events/${eventId}`

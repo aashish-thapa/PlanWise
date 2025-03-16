@@ -337,11 +337,18 @@ export default {
       this.isSendingInvitations = true;
       try{
         const emails = this.guests.map((guest) => guest.email);
-        const response = await axios.post(`${backend}/api/events/inviteAll`, {
+        const response = await axios.post(
+          `${backend}/api/events/inviteAll`, 
+        {
           eventId : this.event.id,
           emails:emails,
+          name: this.event.name,
+          date: this.event.date,
+          time: this.event.time,
+          location: this.event.location
         },
-      this.getAuthHeaders());
+        this.getAuthHeaders()
+      );
 
       this.toast.success("Invitations sent successfully!");
       console.log("Invitations sent", response.data);
