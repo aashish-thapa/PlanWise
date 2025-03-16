@@ -1,7 +1,7 @@
 # PlanWise
 
 PlanWise is your go-to event planning platform that helps you organize and manage events efficiently. With authentication, task management, expense tracking, and guest invitations, PlanWise ensures seamless event coordination.
-Live at: https://wiseplan.vercel.app/
+Live at: https://wiseplan.vercel.app/ (Please expect 20sec loading time while signing up due to free version of render)
 ## Features
 
 ### Authentication
